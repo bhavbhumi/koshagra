@@ -444,12 +444,37 @@ function MemberForm({ familyId, onCancel, onCreated }: { familyId: string; onCan
 
 /* ================= Governance Documents ================= */
 
-function DocumentsTab({ family }: { family: Family }) {
+function DocumentsTab({ family, participantId }: { family: Family; participantId: string | null }) {
   const { items, refresh } = useGovernanceDocuments(family.id);
+  const { items: members } = useFamilyMembers(family.id);
+  const { items: seats } = useGovernanceBodyMembers(family.id);
   const [filter, setFilter] = useState<GovernanceDocumentType | "All">("All");
   const [creatingType, setCreatingType] = useState<GovernanceDocumentType | null>(null);
+  const [grantsByDoc, setGrantsByDoc] = useState<Record<string, AccessGrant>>({});
+
+  const docIds = useMemo(() => items.map((d) => d.id), [items]);
+
+  const loadGrants = useCallback(async () => {
+    if (docIds.length === 0) { setGrantsByDoc({}); return; }
+    const { data } = await supabase
+      .from("access_grants")
+      .select("*")
+      .eq("subject_entity_type", "governance_document")
+      .in("subject_entity_id", docIds)
+      .order("created_at", { ascending: false });
+    const map: Record<string, AccessGrant> = {};
+    for (const g of data ?? []) if (!map[g.subject_entity_id]) map[g.subject_entity_id] = g;
+    setGrantsByDoc(map);
+  }, [docIds]);
+
+  useEffect(() => { loadGrants(); }, [loadGrants]);
+
+  const linkedMemberIds = new Set(members.filter((m) => m.linked_participant_id).map((m) => m.id));
+  const hasLinkedSeat = seats.some((s) => linkedMemberIds.has(s.family_member_id));
 
   const visible = filter === "All" ? items : items.filter((d) => d.document_type === filter);
+
+  async function refreshAll() { await Promise.all([refresh(), loadGrants()]); }
 
   return (
     <div>
@@ -504,19 +529,35 @@ function DocumentsTab({ family }: { family: Family }) {
           <p className="text-sm text-slate-grey">No governance documents recorded yet.</p>
         )}
         {visible.map((d) => (
-          <DocumentCard key={d.id} doc={d} onChanged={refresh} />
+          <DocumentCard
+            key={d.id}
+            doc={d}
+            grant={grantsByDoc[d.id] ?? null}
+            participantId={participantId}
+            hasLinkedSeat={hasLinkedSeat}
+            onChanged={refreshAll}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function DocumentCard({ doc, onChanged }: { doc: GovernanceDocument; onChanged: () => Promise<void> | void }) {
+function DocumentCard({
+  doc, grant, participantId, hasLinkedSeat, onChanged,
+}: {
+  doc: GovernanceDocument;
+  grant: AccessGrant | null;
+  participantId: string | null;
+  hasLinkedSeat: boolean;
+  onChanged: () => Promise<void> | void;
+}) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(doc.title);
   const [body, setBody] = useState(doc.body);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => { setTitle(doc.title); setBody(doc.body); }, [doc.id, doc.title, doc.body]);
 
@@ -532,6 +573,19 @@ function DocumentCard({ doc, onChanged }: { doc: GovernanceDocument; onChanged: 
     setEditing(false);
     await onChanged();
   }
+
+  async function submitRequest() {
+    if (!participantId) return;
+    setBusy(true); setMessage(null);
+    const { error } = await requestActivation(doc.id, participantId);
+    setBusy(false);
+    if (error) { setMessage("Could not request activation. Please try again."); return; }
+    setConfirming(false);
+    await onChanged();
+  }
+
+  const pending = grant && grant.grant_status === "Requested";
+  const canRequest = doc.status === "Draft" && !pending && hasLinkedSeat && !!participantId;
 
   return (
     <article className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
@@ -569,23 +623,77 @@ function DocumentCard({ doc, onChanged }: { doc: GovernanceDocument; onChanged: 
         />
       )}
 
-      <p className="mt-md text-xs text-slate-grey">
-        Activating a Constitution, Policy, or Code of Conduct requires Family Council or
-        Assembly approval — this build doesn't yet support that Maker-Checker step.
-        Drafts are saved and fully editable.
-      </p>
+      {pending ? (
+        <p className="mt-md text-xs text-slate-grey">
+          Activation requested — awaiting Council/Assembly review.
+        </p>
+      ) : doc.status === "Draft" ? (
+        <p className="mt-md text-xs text-slate-grey">
+          Activation requires Family Council or Assembly approval. A seated Participant other
+          than the Maker records the decision on Review.
+        </p>
+      ) : null}
 
       {message && <p className="mt-sm text-sm text-slate-grey">{message}</p>}
 
+      {confirming && (
+        <div className="mt-md rounded-md bg-vault-ivory p-md ring-1 ring-[color:var(--color-border-default)]">
+          <p className="text-sm text-kosha-navy">
+            This sends the draft to your Family Council or Assembly for review. A seated
+            Participant other than you will decide. You can continue editing until a decision
+            is recorded — the request stands on its current content.
+          </p>
+          <div className="mt-md flex flex-wrap gap-sm">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={submitRequest}
+              className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40"
+            >
+              {busy ? "Sending…" : "Confirm request"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirming(false)}
+              className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mt-md flex flex-wrap items-center gap-sm">
         {!editing ? (
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
-          >
-            Edit Draft
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
+            >
+              Edit Draft
+            </button>
+            {doc.status === "Draft" && !pending && (
+              <button
+                type="button"
+                disabled={!canRequest}
+                title={!hasLinkedSeat
+                  ? "Activation needs at least one Council or Assembly seat linked to a real Participant — add one on the Council & Assembly tab."
+                  : undefined}
+                onClick={() => setConfirming(true)}
+                className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40"
+              >
+                Request Activation
+              </button>
+            )}
+            {doc.status === "Draft" && !pending && !hasLinkedSeat && (
+              <span className="text-xs text-slate-grey">
+                Activation needs at least one Council or Assembly seat linked to a real
+                Participant — add one on the Council & Assembly tab.
+              </span>
+            )}
+          </>
         ) : (
           <>
             <button
