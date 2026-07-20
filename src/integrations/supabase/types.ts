@@ -112,6 +112,47 @@ export type Database = {
           },
         ]
       }
+      beneficiaries: {
+        Row: {
+          beneficiary_type: Database["public"]["Enums"]["beneficiary_type"]
+          created_at: string
+          entitlement_note: string | null
+          id: string
+          name_or_description: string
+          notes: string | null
+          trust_id: string
+          updated_at: string
+        }
+        Insert: {
+          beneficiary_type: Database["public"]["Enums"]["beneficiary_type"]
+          created_at?: string
+          entitlement_note?: string | null
+          id?: string
+          name_or_description: string
+          notes?: string | null
+          trust_id: string
+          updated_at?: string
+        }
+        Update: {
+          beneficiary_type?: Database["public"]["Enums"]["beneficiary_type"]
+          created_at?: string
+          entitlement_note?: string | null
+          id?: string
+          name_or_description?: string
+          notes?: string | null
+          trust_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiaries_trust_id_fkey"
+            columns: ["trust_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       board_members: {
         Row: {
           created_at: string
@@ -599,6 +640,79 @@ export type Database = {
         }
         Relationships: []
       }
+      protectors: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          scope_note: string | null
+          trust_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          scope_note?: string | null
+          trust_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          scope_note?: string | null
+          trust_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protectors_trust_id_fkey"
+            columns: ["trust_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settlors: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          trust_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          trust_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          trust_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settlors_trust_id_fkey"
+            columns: ["trust_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       successors: {
         Row: {
           created_at: string
@@ -634,6 +748,129 @@ export type Database = {
           {
             foreignKeyName: "successors_enterprise_id_fkey"
             columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_instruments: {
+        Row: {
+          body: string
+          created_at: string
+          executed_date: string | null
+          id: string
+          notes: string | null
+          title: string
+          trust_id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          executed_date?: string | null
+          id?: string
+          notes?: string | null
+          title?: string
+          trust_id: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          executed_date?: string | null
+          id?: string
+          notes?: string | null
+          title?: string
+          trust_id?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_instruments_trust_id_fkey"
+            columns: ["trust_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_property: {
+        Row: {
+          created_at: string
+          estimated_value: number | null
+          id: string
+          notes: string | null
+          property_description: string
+          trust_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_value?: number | null
+          id?: string
+          notes?: string | null
+          property_description: string
+          trust_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estimated_value?: number | null
+          id?: string
+          notes?: string | null
+          property_description?: string
+          trust_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_property_trust_id_fkey"
+            columns: ["trust_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trustees: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          source_of_authority_note: string | null
+          trust_id: string
+          trustee_role: Database["public"]["Enums"]["trustee_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          source_of_authority_note?: string | null
+          trust_id: string
+          trustee_role?: Database["public"]["Enums"]["trustee_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          source_of_authority_note?: string | null
+          trust_id?: string
+          trustee_role?: Database["public"]["Enums"]["trustee_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trustees_trust_id_fkey"
+            columns: ["trust_id"]
             isOneToOne: false
             referencedRelation: "continuity_subjects"
             referencedColumns: ["id"]
@@ -704,9 +941,11 @@ export type Database = {
         Args: { _family_id: string }
         Returns: boolean
       }
+      participant_owns_trust: { Args: { _trust_id: string }; Returns: boolean }
     }
     Enums: {
       asset_type: "Asset" | "Digital Asset"
+      beneficiary_type: "Named" | "Class"
       enterprise_document_status: "Draft" | "Active" | "Superseded"
       enterprise_document_type: "Enterprise Constitution" | "Buy-Sell Agreement"
       enterprise_principal_role: "Founder" | "Principal"
@@ -731,6 +970,7 @@ export type Database = {
         | "Trust"
         | "Digital Legacy"
       successor_type: "Leadership" | "Ownership"
+      trustee_role: "Trustee" | "Successor Trustee"
       will_status: "Drafted" | "Executed"
     }
     CompositeTypes: {
@@ -860,6 +1100,7 @@ export const Constants = {
   public: {
     Enums: {
       asset_type: ["Asset", "Digital Asset"],
+      beneficiary_type: ["Named", "Class"],
       enterprise_document_status: ["Draft", "Active", "Superseded"],
       enterprise_document_type: [
         "Enterprise Constitution",
@@ -890,6 +1131,7 @@ export const Constants = {
         "Digital Legacy",
       ],
       successor_type: ["Leadership", "Ownership"],
+      trustee_role: ["Trustee", "Successor Trustee"],
       will_status: ["Drafted", "Executed"],
     },
   },
