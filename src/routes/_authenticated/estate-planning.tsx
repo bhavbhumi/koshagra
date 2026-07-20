@@ -82,7 +82,7 @@ function EstatePlanningPage() {
     <section className="max-w-[72rem]">
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
-        {tab === "overview" && <OverviewTab estate={estate} />}
+        {tab === "overview" && <OverviewTab estate={estate} onNavigate={setTab} />}
         {tab === "will" && <WillTab estate={estate} />}
         {tab === "register" && <RegisterTab estate={estate} />}
         {tab === "nominations" && <NominationsTab estate={estate} />}
@@ -121,7 +121,7 @@ function TabBar({ tab, onChange }: { tab: TabKey; onChange: (t: TabKey) => void 
 
 /* ================= Overview ================= */
 
-function OverviewTab({ estate }: { estate: Estate }) {
+function OverviewTab({ estate, onNavigate }: { estate: Estate; onNavigate: (t: TabKey) => void }) {
   const { will } = useWill(estate.id);
   const { items: assets } = useAssets(estate.id);
   const { items: liabilities } = useLiabilities(estate.id);
@@ -175,7 +175,7 @@ function OverviewTab({ estate }: { estate: Estate }) {
         <StatCard
           label="Executors"
           value={roleCounts.Executor}
-          note={roleCounts.Executor === 0 ? { text: "No Executor nominated yet", to: "nominations" } : null}
+          note={roleCounts.Executor === 0 ? { text: "No Executor nominated yet", onClick: () => onNavigate("nominations") } : null}
         />
         <StatCard label="Guardians" value={roleCounts.Guardian} />
         <StatCard label="Beneficiaries" value={roleCounts.Beneficiary} />
@@ -222,7 +222,7 @@ function LifecycleStrip({ current }: { current: LifecycleStage }) {
 
 function StatCard({ label, value, numeric = true, note = null }: {
   label: string; value: number | string; numeric?: boolean;
-  note?: { text: string; to: TabKey } | null;
+  note?: { text: string; onClick: () => void } | null;
 }) {
   return (
     <div className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
@@ -231,16 +231,13 @@ function StatCard({ label, value, numeric = true, note = null }: {
         {value}
       </div>
       {note && (
-        <a
-          href={`#${note.to}`}
-          onClick={(e) => {
-            e.preventDefault();
-            window.dispatchEvent(new CustomEvent("koshagra:estate-tab", { detail: note.to }));
-          }}
-          className="mt-xs block text-xs text-slate-grey underline underline-offset-2 hover:text-kosha-navy"
+        <button
+          type="button"
+          onClick={note.onClick}
+          className="mt-xs block text-left text-xs text-slate-grey underline underline-offset-2 hover:text-kosha-navy"
         >
           {note.text}
-        </a>
+        </button>
       )}
     </div>
   );
