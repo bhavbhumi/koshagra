@@ -812,6 +812,65 @@ export type Database = {
           },
         ]
       }
+      institutional_memory_records: {
+        Row: {
+          alternatives_considered: string | null
+          applicability_signal: Database["public"]["Enums"]["memory_applicability"]
+          confidence_classification:
+            | Database["public"]["Enums"]["memory_confidence"]
+            | null
+          created_at: string
+          decision_summary: string
+          id: string
+          originating_domain: Database["public"]["Enums"]["memory_originating_domain"]
+          originating_steward_note: string | null
+          owner_participant_id: string
+          rationale_text: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alternatives_considered?: string | null
+          applicability_signal?: Database["public"]["Enums"]["memory_applicability"]
+          confidence_classification?:
+            | Database["public"]["Enums"]["memory_confidence"]
+            | null
+          created_at?: string
+          decision_summary: string
+          id?: string
+          originating_domain: Database["public"]["Enums"]["memory_originating_domain"]
+          originating_steward_note?: string | null
+          owner_participant_id: string
+          rationale_text?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          alternatives_considered?: string | null
+          applicability_signal?: Database["public"]["Enums"]["memory_applicability"]
+          confidence_classification?:
+            | Database["public"]["Enums"]["memory_confidence"]
+            | null
+          created_at?: string
+          decision_summary?: string
+          id?: string
+          originating_domain?: Database["public"]["Enums"]["memory_originating_domain"]
+          originating_steward_note?: string | null
+          owner_participant_id?: string
+          rationale_text?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institutional_memory_records_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       key_persons: {
         Row: {
           created_at: string
@@ -850,6 +909,44 @@ export type Database = {
           },
         ]
       }
+      knowledge_stewards: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          owner_participant_id: string
+          source_of_authority_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          owner_participant_id: string
+          source_of_authority_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          owner_participant_id?: string
+          source_of_authority_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_stewards_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       liabilities: {
         Row: {
           amount: number | null
@@ -884,6 +981,117 @@ export type Database = {
             columns: ["estate_id"]
             isOneToOne: false
             referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_concerns: {
+        Row: {
+          concern_type: Database["public"]["Enums"]["memory_concern_type"]
+          created_at: string
+          description: string
+          id: string
+          institutional_memory_record_id: string
+          raised_at: string
+          resolution_note: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["memory_concern_status"]
+        }
+        Insert: {
+          concern_type: Database["public"]["Enums"]["memory_concern_type"]
+          created_at?: string
+          description: string
+          id?: string
+          institutional_memory_record_id: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["memory_concern_status"]
+        }
+        Update: {
+          concern_type?: Database["public"]["Enums"]["memory_concern_type"]
+          created_at?: string
+          description?: string
+          id?: string
+          institutional_memory_record_id?: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["memory_concern_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_concerns_institutional_memory_record_id_fkey"
+            columns: ["institutional_memory_record_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_memory_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_retrievals: {
+        Row: {
+          created_at: string
+          id: string
+          institutional_memory_record_id: string
+          note: string | null
+          retrieved_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          institutional_memory_record_id: string
+          note?: string | null
+          retrieved_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          institutional_memory_record_id?: string
+          note?: string | null
+          retrieved_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_retrievals_institutional_memory_record_id_fkey"
+            columns: ["institutional_memory_record_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_memory_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_reviews: {
+        Row: {
+          created_at: string
+          finding: Database["public"]["Enums"]["memory_applicability"]
+          id: string
+          institutional_memory_record_id: string
+          note: string | null
+          reviewed_at: string
+        }
+        Insert: {
+          created_at?: string
+          finding: Database["public"]["Enums"]["memory_applicability"]
+          id?: string
+          institutional_memory_record_id: string
+          note?: string | null
+          reviewed_at?: string
+        }
+        Update: {
+          created_at?: string
+          finding?: Database["public"]["Enums"]["memory_applicability"]
+          id?: string
+          institutional_memory_record_id?: string
+          note?: string | null
+          reviewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_reviews_institutional_memory_record_id_fkey"
+            columns: ["institutional_memory_record_id"]
+            isOneToOne: false
+            referencedRelation: "institutional_memory_records"
             referencedColumns: ["id"]
           },
         ]
@@ -1592,6 +1800,10 @@ export type Database = {
         Args: { _family_id: string }
         Returns: boolean
       }
+      participant_owns_memory_record: {
+        Args: { _record_id: string }
+        Returns: boolean
+      }
       participant_owns_representation: {
         Args: { _representation_id: string }
         Returns: boolean
@@ -1619,6 +1831,22 @@ export type Database = {
         | "Constitution"
         | "Family Policy"
         | "Code of Conduct"
+      memory_applicability: "Still Applies" | "No Longer Applies"
+      memory_concern_status: "Active" | "Resolved"
+      memory_concern_type: "Fossilization" | "Selective Memory" | "Other"
+      memory_confidence:
+        | "Verified Memory"
+        | "Reported Memory"
+        | "Inferred Memory"
+        | "Unknown Memory"
+      memory_originating_domain:
+        | "Estate Planning"
+        | "Family Governance"
+        | "Business Succession"
+        | "Trust Administration"
+        | "Philanthropy"
+        | "Digital Legacy"
+        | "Cross-Domain / Other"
       nomination_role: "Executor" | "Guardian" | "Beneficiary"
       participant_type:
         | "Individual"
@@ -1798,6 +2026,24 @@ export const Constants = {
         "Constitution",
         "Family Policy",
         "Code of Conduct",
+      ],
+      memory_applicability: ["Still Applies", "No Longer Applies"],
+      memory_concern_status: ["Active", "Resolved"],
+      memory_concern_type: ["Fossilization", "Selective Memory", "Other"],
+      memory_confidence: [
+        "Verified Memory",
+        "Reported Memory",
+        "Inferred Memory",
+        "Unknown Memory",
+      ],
+      memory_originating_domain: [
+        "Estate Planning",
+        "Family Governance",
+        "Business Succession",
+        "Trust Administration",
+        "Philanthropy",
+        "Digital Legacy",
+        "Cross-Domain / Other",
       ],
       nomination_role: ["Executor", "Guardian", "Beneficiary"],
       participant_type: [
