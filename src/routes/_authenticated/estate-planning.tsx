@@ -24,13 +24,21 @@ export const Route = createFileRoute("/_authenticated/estate-planning")({
   component: EstatePlanningPage,
 });
 
-type TabKey = "overview" | "will" | "register" | "nominations";
+type TabKey = "overview" | "will" | "register" | "nominations" | "timeline";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "will", label: "Will" },
   { key: "register", label: "Asset & Liability Register" },
   { key: "nominations", label: "Nominations" },
+  { key: "timeline", label: "Timeline" },
 ];
+
+function formatEnInDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-IN", {
+    year: "numeric", month: "short", day: "2-digit",
+  });
+}
 
 function EstatePlanningPage() {
   const { participant } = useParticipant();
@@ -78,6 +86,7 @@ function EstatePlanningPage() {
         {tab === "will" && <WillTab estate={estate} />}
         {tab === "register" && <RegisterTab estate={estate} />}
         {tab === "nominations" && <NominationsTab estate={estate} />}
+        {tab === "timeline" && <TimelineTab estate={estate} />}
       </div>
     </section>
   );
