@@ -82,9 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Koshagra" },
       { name: "theme-color", content: "#0A1628" },
       { property: "og:title", content: "Koshagra — Institutional Continuity Platform" },
-      { property: "og:description", content: "An institutional operating system for multi-generational continuity." },
+      { property: "og:description", content: "Koshagra is an institutional operating system for multi-generational continuity." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Koshagra — Institutional Continuity Platform" },
+      { name: "twitter:description", content: "Koshagra is an institutional operating system for multi-generational continuity." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/76f591be-b329-4de1-a6ac-848ab244c7df/id-preview-aca98484--0c5e0a41-a58b-41bc-b767-cf051ec86469.lovable.app-1784532238629.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/76f591be-b329-4de1-a6ac-848ab244c7df/id-preview-aca98484--0c5e0a41-a58b-41bc-b767-cf051ec86469.lovable.app-1784532238629.png" },
     ],
     links: [
       {
