@@ -48,10 +48,7 @@ function FamilyGovernancePage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   useEffect(() => {
     if (families.length === 0) { setSelectedId(null); return; }
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem("koshagra.subject") : null;
-    const match = stored && families.find((f) => f.id === stored);
-    if (match) setSelectedId(match.id);
-    else if (families.length === 1) setSelectedId(families[0].id);
+    if (families.length === 1) setSelectedId(families[0].id);
     else setSelectedId((prev) => (prev && families.some((f) => f.id === prev) ? prev : null));
   }, [families]);
 

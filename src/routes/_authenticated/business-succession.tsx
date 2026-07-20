@@ -53,10 +53,7 @@ function BusinessSuccessionPage() {
 
   useEffect(() => {
     if (enterprises.length === 0) { setSelectedId(null); return; }
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem("koshagra.subject") : null;
-    const match = stored && enterprises.find((e) => e.id === stored);
-    if (match) setSelectedId(match.id);
-    else if (enterprises.length === 1) setSelectedId(enterprises[0].id);
+    if (enterprises.length === 1) setSelectedId(enterprises[0].id);
     else setSelectedId((prev) => (prev && enterprises.some((e) => e.id === prev) ? prev : null));
   }, [enterprises]);
 
