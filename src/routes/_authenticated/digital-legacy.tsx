@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
+import { LinkParticipant } from "@/components/access/LinkParticipant";
+import { requestDisposition, useHasPendingRequest } from "@/lib/access-grants";
 
 export const Route = createFileRoute("/_authenticated/digital-legacy")({
   component: DigitalLegacyPage,
@@ -34,6 +36,7 @@ type DigitalExecutor = {
   full_name: string;
   source_of_authority_note: string | null;
   notes: string | null;
+  linked_participant_id: string | null;
   created_at: string;
 };
 
@@ -47,6 +50,8 @@ type Representation = {
   transition_triggered_at: string | null;
   transition_trigger_type: TriggerType | null;
   transition_note: string | null;
+  disposition: "Memorialize" | "Retire" | null;
+  disposition_decided_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -378,6 +383,12 @@ function DigitalExecutorsSection({
               <div className="text-sm font-semibold text-kosha-navy">{e.full_name}</div>
               {e.source_of_authority_note && <div className="mt-xs text-xs text-slate-grey">Source of authority · {e.source_of_authority_note}</div>}
               {e.notes && <p className="mt-xs text-sm text-slate-grey">{e.notes}</p>}
+              <LinkParticipant
+                table="digital_executors"
+                rowId={e.id}
+                linkedParticipantId={e.linked_participant_id}
+                onChanged={onChanged}
+              />
             </li>
           ))}
         </ul>
@@ -665,25 +676,27 @@ function TransitionTab({ rep, onRefresh }: { rep: Representation; onRefresh: () 
   }
 
   if (rep.transition_triggered_at) {
+    if (rep.disposition_decided_at && rep.disposition) {
+      return (
+        <div className="space-y-md">
+          <TriggerRecordCard rep={rep} />
+          <div className={cardCls}>
+            <div className={labelCls}>Disposition decided</div>
+            <div className="mt-xs text-sm text-kosha-navy">
+              {rep.disposition} · <span className="font-numeral">{formatDate(rep.disposition_decided_at)}</span>
+            </div>
+            <p className="mt-sm text-xs text-slate-grey">
+              Recorded through Maker-Checker. The underlying account or key is not touched by
+              Koshagra — this records that a Digital Executor's decision was made.
+            </p>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="space-y-md">
-        <div className={cardCls}>
-          <div className={labelCls}>Transition Trigger recorded</div>
-          <div className="mt-xs text-sm text-kosha-navy">
-            {rep.transition_trigger_type ?? "—"} · <span className="font-numeral">{formatDate(rep.transition_triggered_at)}</span>
-          </div>
-          {rep.transition_note && (
-            <p className="mt-sm text-sm text-slate-grey whitespace-pre-wrap">{rep.transition_note}</p>
-          )}
-        </div>
-        <div className={cardCls}>
-          <p className="text-sm text-slate-grey">
-            A Transition Trigger has been recorded. Deciding whether to Memorialize or Retire this
-            Representation requires real Digital Executor Maker-Checker this build doesn't yet
-            support — record any interim outcome informally using the note above until that
-            capability exists.
-          </p>
-        </div>
+        <TriggerRecordCard rep={rep} />
+        <RequestDispositionCard rep={rep} />
       </div>
     );
   }
@@ -730,6 +743,75 @@ function TransitionTab({ rep, onRefresh }: { rep: Representation; onRefresh: () 
         </form>
       )}
     </div>
+  );
+}
+
+function TriggerRecordCard({ rep }: { rep: Representation }) {
+  return (
+    <div className={cardCls}>
+      <div className={labelCls}>Transition Trigger recorded</div>
+      <div className="mt-xs text-sm text-kosha-navy">
+        {rep.transition_trigger_type ?? "—"} · <span className="font-numeral">{formatDate(rep.transition_triggered_at)}</span>
+      </div>
+      {rep.transition_note && (
+        <p className="mt-sm text-sm text-slate-grey whitespace-pre-wrap">{rep.transition_note}</p>
+      )}
+    </div>
+  );
+}
+
+function RequestDispositionCard({ rep }: { rep: Representation }) {
+  const { participant } = useParticipant();
+  const [outcome, setOutcome] = useState<"Memorialize" | "Retire">("Memorialize");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const pendingMem = useHasPendingRequest(participant?.id ?? null, "representation", rep.id, "Decide Disposition", "Memorialize");
+  const pendingRet = useHasPendingRequest(participant?.id ?? null, "representation", rep.id, "Decide Disposition", "Retire");
+  const anyPending = pendingMem.pending || pendingRet.pending;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!participant) return;
+    setBusy(true); setMessage(null);
+    const { error } = await requestDisposition(rep.id, outcome, rep.name, participant.id);
+    setBusy(false);
+    if (error) { setMessage(error.message || "Could not submit this request."); return; }
+    await Promise.all([pendingMem.refresh(), pendingRet.refresh()]);
+  }
+
+  if (anyPending) {
+    return (
+      <div className={cardCls}>
+        <div className={labelCls}>Disposition request pending</div>
+        <p className="mt-xs text-sm text-slate-grey">
+          A Digital Executor linked to this workspace can approve or deny the request on the
+          Review workspace. Authorized Scope remains fixed either way.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className={cardCls + " space-y-md"}>
+      <div>
+        <h3 className="font-display text-[18px] leading-[26px] text-kosha-navy">Request Disposition</h3>
+        <p className="mt-xs text-sm text-slate-grey">
+          The Digital Executor decides Memorialize (preserve access as-was) or Retire (close out).
+          Koshagra records the decision; it does not execute it on the underlying platform.
+        </p>
+      </div>
+      <div>
+        <label className={labelCls}>Requested outcome</label>
+        <select value={outcome} onChange={(e) => setOutcome(e.target.value as "Memorialize" | "Retire")} className={inputCls}>
+          <option value="Memorialize">Memorialize</option>
+          <option value="Retire">Retire</option>
+        </select>
+      </div>
+      {message && <p className="text-sm text-slate-grey">{message}</p>}
+      <button type="submit" disabled={busy || !participant} className={primaryBtn}>
+        {busy ? "Submitting…" : "Send for Digital Executor approval"}
+      </button>
+    </form>
   );
 }
 

@@ -23,10 +23,12 @@ export type Database = {
           grant_status: string
           id: string
           maker_participant_id: string
+          requested_outcome: string | null
           requested_transition: string
           required_scope_tier: string
           subject_entity_id: string
           subject_entity_type: string
+          subject_label: string | null
         }
         Insert: {
           checker_participant_id?: string | null
@@ -36,10 +38,12 @@ export type Database = {
           grant_status?: string
           id?: string
           maker_participant_id: string
+          requested_outcome?: string | null
           requested_transition: string
           required_scope_tier?: string
           subject_entity_id: string
           subject_entity_type: string
+          subject_label?: string | null
         }
         Update: {
           checker_participant_id?: string | null
@@ -49,10 +53,12 @@ export type Database = {
           grant_status?: string
           id?: string
           maker_participant_id?: string
+          requested_outcome?: string | null
           requested_transition?: string
           required_scope_tier?: string
           subject_entity_id?: string
           subject_entity_type?: string
+          subject_label?: string | null
         }
         Relationships: [
           {
@@ -356,6 +362,8 @@ export type Database = {
       }
       dedications: {
         Row: {
+          concluded_at: string | null
+          conclusion_type: string | null
           created_at: string
           id: string
           name: string
@@ -366,6 +374,8 @@ export type Database = {
           vehicle: Database["public"]["Enums"]["dedication_vehicle"] | null
         }
         Insert: {
+          concluded_at?: string | null
+          conclusion_type?: string | null
           created_at?: string
           id?: string
           name: string
@@ -376,6 +386,8 @@ export type Database = {
           vehicle?: Database["public"]["Enums"]["dedication_vehicle"] | null
         }
         Update: {
+          concluded_at?: string | null
+          conclusion_type?: string | null
           created_at?: string
           id?: string
           name?: string
@@ -407,6 +419,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          linked_participant_id: string | null
           notes: string | null
           owner_participant_id: string
           source_of_authority_note: string | null
@@ -416,6 +429,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           owner_participant_id: string
           source_of_authority_note?: string | null
@@ -425,12 +439,20 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           owner_participant_id?: string
           source_of_authority_note?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "digital_executors_linked_participant_id_fkey"
+            columns: ["linked_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "digital_executors_owner_participant_id_fkey"
             columns: ["owner_participant_id"]
@@ -526,6 +548,7 @@ export type Database = {
           dedication_id: string
           full_name: string
           id: string
+          linked_participant_id: string | null
           notes: string | null
           scope_note: string | null
         }
@@ -534,6 +557,7 @@ export type Database = {
           dedication_id: string
           full_name: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           scope_note?: string | null
         }
@@ -542,6 +566,7 @@ export type Database = {
           dedication_id?: string
           full_name?: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           scope_note?: string | null
         }
@@ -551,6 +576,13 @@ export type Database = {
             columns: ["dedication_id"]
             isOneToOne: false
             referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enforcers_linked_participant_id_fkey"
+            columns: ["linked_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
             referencedColumns: ["id"]
           },
         ]
@@ -858,6 +890,7 @@ export type Database = {
           originating_steward_note: string | null
           owner_participant_id: string
           rationale_text: string | null
+          retired_at: string | null
           title: string
           updated_at: string
         }
@@ -874,6 +907,7 @@ export type Database = {
           originating_steward_note?: string | null
           owner_participant_id: string
           rationale_text?: string | null
+          retired_at?: string | null
           title: string
           updated_at?: string
         }
@@ -890,6 +924,7 @@ export type Database = {
           originating_steward_note?: string | null
           owner_participant_id?: string
           rationale_text?: string | null
+          retired_at?: string | null
           title?: string
           updated_at?: string
         }
@@ -946,6 +981,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          linked_participant_id: string | null
           notes: string | null
           owner_participant_id: string
           source_of_authority_note: string | null
@@ -955,6 +991,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           owner_participant_id: string
           source_of_authority_note?: string | null
@@ -964,12 +1001,20 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           owner_participant_id?: string
           source_of_authority_note?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "knowledge_stewards_linked_participant_id_fkey"
+            columns: ["linked_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "knowledge_stewards_owner_participant_id_fkey"
             columns: ["owner_participant_id"]
@@ -1401,6 +1446,7 @@ export type Database = {
           created_at: string
           id: string
           owner_participant_id: string
+          retired_at: string | null
           updated_at: string
         }
         Insert: {
@@ -1414,6 +1460,7 @@ export type Database = {
           created_at?: string
           id?: string
           owner_participant_id: string
+          retired_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -1427,6 +1474,7 @@ export type Database = {
           created_at?: string
           id?: string
           owner_participant_id?: string
+          retired_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1444,6 +1492,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          linked_participant_id: string | null
           notes: string | null
           owner_participant_id: string
           source_of_authority_note: string | null
@@ -1453,6 +1502,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           owner_participant_id: string
           source_of_authority_note?: string | null
@@ -1462,12 +1512,20 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          linked_participant_id?: string | null
           notes?: string | null
           owner_participant_id?: string
           source_of_authority_note?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "preparedness_stewards_linked_participant_id_fkey"
+            columns: ["linked_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "preparedness_stewards_owner_participant_id_fkey"
             columns: ["owner_participant_id"]
@@ -1683,6 +1741,8 @@ export type Database = {
         Row: {
           authorized_scope: string
           created_at: string
+          disposition: string | null
+          disposition_decided_at: string | null
           id: string
           name: string
           owner_participant_id: string
@@ -1698,6 +1758,8 @@ export type Database = {
         Insert: {
           authorized_scope: string
           created_at?: string
+          disposition?: string | null
+          disposition_decided_at?: string | null
           id?: string
           name: string
           owner_participant_id: string
@@ -1713,6 +1775,8 @@ export type Database = {
         Update: {
           authorized_scope?: string
           created_at?: string
+          disposition?: string | null
+          disposition_decided_at?: string | null
           id?: string
           name?: string
           owner_participant_id?: string
@@ -1986,6 +2050,22 @@ export type Database = {
         }[]
       }
       is_eligible_checker: { Args: { _grant_id: string }; Returns: boolean }
+      is_eligible_checker_dedication: {
+        Args: { _grant_id: string }
+        Returns: boolean
+      }
+      is_eligible_checker_memory: {
+        Args: { _grant_id: string }
+        Returns: boolean
+      }
+      is_eligible_checker_preparedness: {
+        Args: { _grant_id: string }
+        Returns: boolean
+      }
+      is_eligible_checker_representation: {
+        Args: { _grant_id: string }
+        Returns: boolean
+      }
       participant_owns_dedication: {
         Args: { _dedication_id: string }
         Returns: boolean
