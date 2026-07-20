@@ -121,6 +121,14 @@ export const WORKSPACES: Workspace[] = [
     kind: "utility",
   },
   {
+    slug: "review",
+    path: "/review",
+    name: "Review",
+    purpose:
+      "Every Access Grant awaiting your decision, and the status of what you've requested.",
+    kind: "utility",
+  },
+  {
     slug: "notifications",
     path: "/notifications",
     name: "Notification Center",

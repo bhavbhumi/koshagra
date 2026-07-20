@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_grants: {
+        Row: {
+          checker_participant_id: string | null
+          created_at: string
+          decision_at: string | null
+          denial_reason: string | null
+          grant_status: string
+          id: string
+          maker_participant_id: string
+          requested_transition: string
+          required_scope_tier: string
+          subject_entity_id: string
+          subject_entity_type: string
+        }
+        Insert: {
+          checker_participant_id?: string | null
+          created_at?: string
+          decision_at?: string | null
+          denial_reason?: string | null
+          grant_status?: string
+          id?: string
+          maker_participant_id: string
+          requested_transition: string
+          required_scope_tier?: string
+          subject_entity_id: string
+          subject_entity_type: string
+        }
+        Update: {
+          checker_participant_id?: string | null
+          created_at?: string
+          decision_at?: string | null
+          denial_reason?: string | null
+          grant_status?: string
+          id?: string
+          maker_participant_id?: string
+          requested_transition?: string
+          required_scope_tier?: string
+          subject_entity_id?: string
+          subject_entity_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_grants_checker_participant_id_fkey"
+            columns: ["checker_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "access_grants_maker_participant_id_fkey"
+            columns: ["maker_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assets: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"]
@@ -100,6 +157,7 @@ export type Database = {
           family_id: string
           full_name: string
           id: string
+          linked_participant_id: string | null
           status: Database["public"]["Enums"]["family_member_status"]
           updated_at: string
         }
@@ -109,6 +167,7 @@ export type Database = {
           family_id: string
           full_name: string
           id?: string
+          linked_participant_id?: string | null
           status?: Database["public"]["Enums"]["family_member_status"]
           updated_at?: string
         }
@@ -118,6 +177,7 @@ export type Database = {
           family_id?: string
           full_name?: string
           id?: string
+          linked_participant_id?: string | null
           status?: Database["public"]["Enums"]["family_member_status"]
           updated_at?: string
         }
@@ -127,6 +187,13 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_linked_participant_id_fkey"
+            columns: ["linked_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
             referencedColumns: ["id"]
           },
         ]
@@ -372,6 +439,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decide_access_grant: {
+        Args: { _decision: string; _grant_id: string; _reason?: string }
+        Returns: undefined
+      }
+      find_participant_by_email: {
+        Args: { _email: string }
+        Returns: {
+          display_name: string
+          id: string
+        }[]
+      }
+      is_eligible_checker: { Args: { _grant_id: string }; Returns: boolean }
       participant_owns_estate: {
         Args: { _estate_id: string }
         Returns: boolean
