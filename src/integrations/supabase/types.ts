@@ -112,6 +112,48 @@ export type Database = {
           },
         ]
       }
+      board_members: {
+        Row: {
+          created_at: string
+          enterprise_id: string
+          id: string
+          principal_id: string
+          seat_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enterprise_id: string
+          id?: string
+          principal_id: string
+          seat_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enterprise_id?: string
+          id?: string
+          principal_id?: string
+          seat_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_members_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "board_members_principal_id_fkey"
+            columns: ["principal_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_principals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       continuity_subjects: {
         Row: {
           created_at: string
@@ -146,6 +188,88 @@ export type Database = {
             columns: ["owner_participant_id"]
             isOneToOne: false
             referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enterprise_documents: {
+        Row: {
+          body: string
+          created_at: string
+          document_type: Database["public"]["Enums"]["enterprise_document_type"]
+          enterprise_id: string
+          id: string
+          status: Database["public"]["Enums"]["enterprise_document_status"]
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          document_type: Database["public"]["Enums"]["enterprise_document_type"]
+          enterprise_id: string
+          id?: string
+          status?: Database["public"]["Enums"]["enterprise_document_status"]
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          document_type?: Database["public"]["Enums"]["enterprise_document_type"]
+          enterprise_id?: string
+          id?: string
+          status?: Database["public"]["Enums"]["enterprise_document_status"]
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_documents_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enterprise_principals: {
+        Row: {
+          created_at: string
+          enterprise_id: string
+          full_name: string
+          id: string
+          role: Database["public"]["Enums"]["enterprise_principal_role"]
+          role_detail: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enterprise_id: string
+          full_name: string
+          id?: string
+          role?: Database["public"]["Enums"]["enterprise_principal_role"]
+          role_detail?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enterprise_id?: string
+          full_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["enterprise_principal_role"]
+          role_detail?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_principals_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
             referencedColumns: ["id"]
           },
         ]
@@ -287,6 +411,44 @@ export type Database = {
           },
         ]
       }
+      key_persons: {
+        Row: {
+          created_at: string
+          enterprise_id: string
+          full_name: string
+          id: string
+          mitigation_notes: string | null
+          significance: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enterprise_id: string
+          full_name: string
+          id?: string
+          mitigation_notes?: string | null
+          significance?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enterprise_id?: string
+          full_name?: string
+          id?: string
+          mitigation_notes?: string | null
+          significance?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "key_persons_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       liabilities: {
         Row: {
           amount: number | null
@@ -366,6 +528,44 @@ export type Database = {
           },
         ]
       }
+      ownership_interests: {
+        Row: {
+          created_at: string
+          enterprise_id: string
+          holder_name: string
+          id: string
+          interest_description: string | null
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enterprise_id: string
+          holder_name: string
+          id?: string
+          interest_description?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enterprise_id?: string
+          holder_name?: string
+          id?: string
+          interest_description?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ownership_interests_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           auth_user_id: string | null
@@ -398,6 +598,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      successors: {
+        Row: {
+          created_at: string
+          enterprise_id: string
+          full_name: string
+          id: string
+          notes: string | null
+          relationship_to_enterprise: string | null
+          successor_type: Database["public"]["Enums"]["successor_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enterprise_id: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          relationship_to_enterprise?: string | null
+          successor_type: Database["public"]["Enums"]["successor_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enterprise_id?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          relationship_to_enterprise?: string | null
+          successor_type?: Database["public"]["Enums"]["successor_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "successors_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wills: {
         Row: {
@@ -451,6 +692,10 @@ export type Database = {
         }[]
       }
       is_eligible_checker: { Args: { _grant_id: string }; Returns: boolean }
+      participant_owns_enterprise: {
+        Args: { _enterprise_id: string }
+        Returns: boolean
+      }
       participant_owns_estate: {
         Args: { _estate_id: string }
         Returns: boolean
@@ -462,6 +707,9 @@ export type Database = {
     }
     Enums: {
       asset_type: "Asset" | "Digital Asset"
+      enterprise_document_status: "Draft" | "Active" | "Superseded"
+      enterprise_document_type: "Enterprise Constitution" | "Buy-Sell Agreement"
+      enterprise_principal_role: "Founder" | "Principal"
       family_member_status: "Active" | "Suspended"
       governance_body: "Council" | "Assembly"
       governance_document_status: "Draft" | "Active" | "Superseded"
@@ -482,6 +730,7 @@ export type Database = {
         | "Enterprise"
         | "Trust"
         | "Digital Legacy"
+      successor_type: "Leadership" | "Ownership"
       will_status: "Drafted" | "Executed"
     }
     CompositeTypes: {
@@ -611,6 +860,12 @@ export const Constants = {
   public: {
     Enums: {
       asset_type: ["Asset", "Digital Asset"],
+      enterprise_document_status: ["Draft", "Active", "Superseded"],
+      enterprise_document_type: [
+        "Enterprise Constitution",
+        "Buy-Sell Agreement",
+      ],
+      enterprise_principal_role: ["Founder", "Principal"],
       family_member_status: ["Active", "Suspended"],
       governance_body: ["Council", "Assembly"],
       governance_document_status: ["Draft", "Active", "Superseded"],
@@ -634,6 +889,7 @@ export const Constants = {
         "Trust",
         "Digital Legacy",
       ],
+      successor_type: ["Leadership", "Ownership"],
       will_status: ["Drafted", "Executed"],
     },
   },
