@@ -50,10 +50,10 @@ function TrustAdministrationPage() {
 
   useEffect(() => {
     if (trusts.length === 0) { setSelectedId(null); return; }
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem("koshagra.subject") : null;
-    const match = stored && trusts.find((t) => t.id === stored);
-    if (match) setSelectedId(match.id);
-    else if (trusts.length === 1) setSelectedId(trusts[0].id);
+    // Auto-resolve only when exactly one Trust exists. With multiple, always
+    // show the in-page picker so the Participant chooses deliberately — the
+    // Workspace Switcher in the header remains available for quick swaps.
+    if (trusts.length === 1) setSelectedId(trusts[0].id);
     else setSelectedId((prev) => (prev && trusts.some((t) => t.id === prev) ? prev : null));
   }, [trusts]);
 
