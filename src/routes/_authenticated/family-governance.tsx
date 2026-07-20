@@ -800,7 +800,7 @@ function DocumentForm({
 /* ================= Council & Assembly ================= */
 
 function BodiesTab({ family }: { family: Family }) {
-  const { items: members } = useFamilyMembers(family.id);
+  const { items: members, refresh: refreshMembers } = useFamilyMembers(family.id);
   const { items: seats, refresh } = useGovernanceBodyMembers(family.id);
   const [body, setBody] = useState<GovernanceBody>("Council");
 
@@ -809,6 +809,55 @@ function BodiesTab({ family }: { family: Family }) {
     () => new Map(members.map((m) => [m.id, m] as const)),
     [members],
   );
+
+  const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null);
+  const [linkEmail, setLinkEmail] = useState("");
+  const [linkBusy, setLinkBusy] = useState(false);
+  const [linkMessage, setLinkMessage] = useState<string | null>(null);
+  const [linkedNames, setLinkedNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const ids = Array.from(new Set(
+        members.map((m) => m.linked_participant_id).filter((v): v is string => !!v),
+      ));
+      if (ids.length === 0) { setLinkedNames({}); return; }
+      const { data } = await supabase.from("participants").select("id, display_name").in("id", ids);
+      if (cancel || !data) return;
+      const map: Record<string, string> = {};
+      for (const p of data) map[p.id] = p.display_name;
+      setLinkedNames(map);
+    })();
+    return () => { cancel = true; };
+  }, [members]);
+
+  function openLink(memberId: string) {
+    setLinkingMemberId(memberId);
+    setLinkEmail("");
+    setLinkMessage(null);
+  }
+
+  async function submitLink(memberId: string) {
+    if (!linkEmail.trim()) { setLinkMessage("Enter the Participant's email."); return; }
+    setLinkBusy(true); setLinkMessage(null);
+    const { data, error } = await findParticipantByEmail(linkEmail.trim());
+    if (error) { setLinkBusy(false); setLinkMessage("Could not look up that Participant."); return; }
+    if (!data) { setLinkBusy(false); setLinkMessage("No Koshagra Participant is registered with that email yet."); return; }
+    const { error: upErr } = await supabase
+      .from("family_members")
+      .update({ linked_participant_id: data.id })
+      .eq("id", memberId);
+    setLinkBusy(false);
+    if (upErr) { setLinkMessage("Could not link this seat. Please try again."); return; }
+    setLinkingMemberId(null); setLinkEmail("");
+    await refreshMembers();
+  }
+
+  async function unlink(memberId: string) {
+    await supabase.from("family_members").update({ linked_participant_id: null }).eq("id", memberId);
+    await refreshMembers();
+  }
 
   return (
     <div>
@@ -853,22 +902,73 @@ function BodiesTab({ family }: { family: Family }) {
         )}
         {seatsForBody.map((s) => {
           const m = membersById.get(s.family_member_id);
+          const linkedName = m?.linked_participant_id ? linkedNames[m.linked_participant_id] : null;
+          const isLinking = linkingMemberId === s.family_member_id;
           return (
             <li key={s.id} className="flex flex-wrap items-center justify-between gap-md rounded-md bg-pure-white px-md py-3 shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
               <div className="min-w-0">
                 <div className="text-sm text-kosha-navy">{m?.full_name ?? "—"}</div>
                 {s.seat_note && <div className="text-xs text-slate-grey">{s.seat_note}</div>}
+                {linkedName && (
+                  <div className="text-xs text-slate-grey">Linked to <span className="text-kosha-navy">{linkedName}</span></div>
+                )}
+                {isLinking && (
+                  <div className="mt-sm flex flex-wrap items-center gap-sm">
+                    <input
+                      value={linkEmail}
+                      onChange={(e) => setLinkEmail(e.target.value)}
+                      placeholder="participant@example.com"
+                      className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-1 text-sm text-kosha-navy"
+                    />
+                    <button
+                      type="button"
+                      disabled={linkBusy}
+                      onClick={() => submitLink(s.family_member_id)}
+                      className="rounded-md bg-kosha-navy px-md py-1 text-xs font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40"
+                    >
+                      {linkBusy ? "Linking…" : "Link"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setLinkingMemberId(null); setLinkEmail(""); setLinkMessage(null); }}
+                      className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-1 text-xs font-semibold text-kosha-navy hover:bg-vault-ivory"
+                    >
+                      Cancel
+                    </button>
+                    {linkMessage && <span className="text-xs text-slate-grey">{linkMessage}</span>}
+                  </div>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={async () => {
-                  await supabase.from("governance_body_members").delete().eq("id", s.id);
-                  await refresh();
-                }}
-                className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-sm py-1 text-xs font-semibold text-kosha-navy hover:bg-vault-ivory"
-              >
-                Remove seat
-              </button>
+              <div className="flex flex-wrap items-center gap-sm">
+                {m && !m.linked_participant_id && !isLinking && (
+                  <button
+                    type="button"
+                    onClick={() => openLink(s.family_member_id)}
+                    className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-sm py-1 text-xs font-semibold text-kosha-navy hover:bg-vault-ivory"
+                  >
+                    Link Participant
+                  </button>
+                )}
+                {m?.linked_participant_id && (
+                  <button
+                    type="button"
+                    onClick={() => unlink(s.family_member_id)}
+                    className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-sm py-1 text-xs font-semibold text-kosha-navy hover:bg-vault-ivory"
+                  >
+                    Unlink
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await supabase.from("governance_body_members").delete().eq("id", s.id);
+                    await refresh();
+                  }}
+                  className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-sm py-1 text-xs font-semibold text-kosha-navy hover:bg-vault-ivory"
+                >
+                  Remove seat
+                </button>
+              </div>
             </li>
           );
         })}
