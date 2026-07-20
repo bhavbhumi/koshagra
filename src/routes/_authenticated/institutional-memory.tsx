@@ -1,3 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WorkspacePlaceholder } from "@/components/shell/WorkspacePlaceholder";
-export const Route = createFileRoute("/_authenticated/institutional-memory")({ component: WorkspacePlaceholder });
+import { InstitutionalMemoryPage } from "@/components/institutional-memory/InstitutionalMemoryPage";
+export const Route = createFileRoute("/_authenticated/institutional-memory")({
+  component: InstitutionalMemoryPage,
+});
