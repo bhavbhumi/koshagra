@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
+import { LinkParticipant } from "@/components/access/LinkParticipant";
+import { requestMemoryRetirement, useHasPendingRequest } from "@/lib/access-grants";
 
 /* =============== Types =============== */
 
@@ -46,6 +48,7 @@ type KnowledgeSteward = {
   full_name: string;
   source_of_authority_note: string | null;
   notes: string | null;
+  linked_participant_id: string | null;
   created_at: string;
 };
 
@@ -60,6 +63,7 @@ type MemoryRecord = {
   alternatives_considered: string | null;
   confidence_classification: Confidence | null;
   applicability_signal: Applicability;
+  retired_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -427,6 +431,12 @@ function StewardsSection({
               <div className="text-sm font-semibold text-kosha-navy">{s.full_name}</div>
               {s.source_of_authority_note && <div className="mt-xs text-xs text-slate-grey">Source of authority · {s.source_of_authority_note}</div>}
               {s.notes && <p className="mt-xs text-sm text-slate-grey">{s.notes}</p>}
+              <LinkParticipant
+                table="knowledge_stewards"
+                rowId={s.id}
+                linkedParticipantId={s.linked_participant_id}
+                onChanged={onChanged}
+              />
             </li>
           ))}
         </ul>
@@ -732,9 +742,11 @@ function ReviewsTab({ record, onRefresh }: { record: MemoryRecord; onRefresh: ()
   const [message, setMessage] = useState<string | null>(null);
 
   const curated = isCurated(record);
+  const retired = !!record.retired_at;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (retired) return;
     setBusy(true);
     const { error } = await supabase.from("memory_reviews").insert({
       institutional_memory_record_id: record.id,
@@ -762,12 +774,21 @@ function ReviewsTab({ record, onRefresh }: { record: MemoryRecord; onRefresh: ()
 
   return (
     <div className="space-y-lg">
+      {retired && (
+        <div className={cardCls}>
+          <div className={labelCls}>Record retired</div>
+          <div className="mt-xs font-numeral text-sm text-kosha-navy">{formatDate(record.retired_at)}</div>
+          <p className="mt-sm text-xs text-slate-grey">
+            Retired through Maker-Checker. The Curated rationale is preserved unchanged — the record
+            is simply no longer surfaced as an active retrieval.
+          </p>
+        </div>
+      )}
       <form onSubmit={submit} className={cardCls + " space-y-md"}>
         <h3 className="font-display text-[18px] leading-[26px] text-kosha-navy">Record Review</h3>
         <p className="text-xs text-slate-grey">
           Recording a finding of "No Longer Applies" updates this record's Applicability Signal.
-          It does not retire the record — Retirement needs a real Knowledge Steward
-          Maker-Checker decision this build doesn't yet support.
+          It does not retire the record — Retirement is a separate Maker-Checker decision below.
         </p>
         <div>
           <label className={labelCls} htmlFor="rev-finding">Finding</label>
@@ -781,8 +802,10 @@ function ReviewsTab({ record, onRefresh }: { record: MemoryRecord; onRefresh: ()
           <textarea id="rev-note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} className={inputCls} />
         </div>
         {message && <p className="text-sm text-slate-grey">{message}</p>}
-        <button type="submit" disabled={busy} className={primaryBtn}>{busy ? "Saving…" : "Record Review"}</button>
+        <button type="submit" disabled={busy || retired} className={primaryBtn}>{busy ? "Saving…" : "Record Review"}</button>
       </form>
+
+      {!retired && <RequestMemoryRetirementCard record={record} />}
 
       {items.length === 0 ? (
         <p className="text-sm text-slate-grey">No reviews recorded yet.</p>
@@ -799,6 +822,50 @@ function ReviewsTab({ record, onRefresh }: { record: MemoryRecord; onRefresh: ()
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function RequestMemoryRetirementCard({ record }: { record: MemoryRecord }) {
+  const { participant } = useParticipant();
+  const { pending, refresh } = useHasPendingRequest(
+    participant?.id ?? null, "institutional_memory_record", record.id, "Retire",
+  );
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function submit() {
+    if (!participant) return;
+    setBusy(true); setMessage(null);
+    const { error } = await requestMemoryRetirement(record.id, record.title, participant.id);
+    setBusy(false);
+    if (error) { setMessage(error.message || "Could not submit this request."); return; }
+    await refresh();
+  }
+
+  if (pending) {
+    return (
+      <div className={cardCls}>
+        <div className={labelCls}>Retirement request pending</div>
+        <p className="mt-xs text-sm text-slate-grey">
+          A Knowledge Steward linked to this workspace can approve or deny on the Review workspace.
+          The Curated rationale remains intact regardless of the decision.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cardCls + " space-y-sm"}>
+      <h3 className="font-display text-[18px] leading-[26px] text-kosha-navy">Request Retirement</h3>
+      <p className="text-xs text-slate-grey">
+        Retirement stops surfacing this record in active retrieval. The historical rationale
+        is preserved verbatim (DM-0008 §4.4). A Knowledge Steward other than you must approve.
+      </p>
+      {message && <p className="text-sm text-slate-grey">{message}</p>}
+      <button type="button" onClick={submit} disabled={busy || !participant} className={primaryBtn}>
+        {busy ? "Submitting…" : "Send for Steward approval"}
+      </button>
     </div>
   );
 }

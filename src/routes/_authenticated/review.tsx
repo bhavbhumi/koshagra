@@ -4,18 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import {
   decideAccessGrant,
+  subjectTypeLabel,
+  transitionLabel,
   useMyRequests,
   usePendingReviews,
   type AccessGrant,
 } from "@/lib/access-grants";
 
 export const Route = createFileRoute("/_authenticated/review")({ component: ReviewPage });
-
-type DocContext = {
-  document_title: string;
-  document_type: string;
-  family_name: string;
-};
 
 type ParticipantLite = { id: string; display_name: string };
 
@@ -26,14 +22,6 @@ function ReviewPage() {
   const { items: mine, loading: mineLoading, refresh: refreshMine } = useMyRequests(pid);
 
   const allGrants = useMemo(() => [...pending, ...mine], [pending, mine]);
-  const docIds = useMemo(
-    () => Array.from(new Set(
-      allGrants
-        .filter((g) => g.subject_entity_type === "governance_document")
-        .map((g) => g.subject_entity_id),
-    )),
-    [allGrants],
-  );
   const participantIds = useMemo(
     () => Array.from(new Set(
       allGrants.flatMap((g) => [g.maker_participant_id, g.checker_participant_id])
@@ -42,30 +30,7 @@ function ReviewPage() {
     [allGrants],
   );
 
-  const [docCtx, setDocCtx] = useState<Record<string, DocContext>>({});
   const [people, setPeople] = useState<Record<string, ParticipantLite>>({});
-
-  useEffect(() => {
-    let cancel = false;
-    (async () => {
-      if (docIds.length === 0) { setDocCtx({}); return; }
-      const { data } = await supabase
-        .from("governance_documents")
-        .select("id, title, document_type, family_id, continuity_subjects(name)")
-        .in("id", docIds);
-      if (cancel || !data) return;
-      const map: Record<string, DocContext> = {};
-      for (const row of data as Array<{ id: string; title: string; document_type: string; continuity_subjects: { name: string } | null }>) {
-        map[row.id] = {
-          document_title: row.title,
-          document_type: row.document_type,
-          family_name: row.continuity_subjects?.name ?? "—",
-        };
-      }
-      setDocCtx(map);
-    })();
-    return () => { cancel = true; };
-  }, [docIds]);
 
   useEffect(() => {
     let cancel = false;
@@ -101,7 +66,7 @@ function ReviewPage() {
       <div>
         <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">Awaiting your decision</h2>
         <p className="mt-xs text-sm text-slate-grey">
-          Access Grants where a Council or Assembly seat linked to you is eligible to act as Checker.
+          Access Grants where a seat or Steward linked to you is eligible to act as Checker.
         </p>
         <div className="mt-md space-y-md">
           {pending.length === 0 && (
@@ -111,7 +76,6 @@ function ReviewPage() {
             <PendingCard
               key={g.id}
               grant={g}
-              doc={docCtx[g.subject_entity_id]}
               makerName={people[g.maker_participant_id]?.display_name ?? "—"}
               onDecided={refresh}
             />
@@ -127,40 +91,52 @@ function ReviewPage() {
         <div className="mt-md space-y-md">
           {mine.length === 0 && (
             <p className="text-sm text-slate-grey">
-              You haven't requested any transitions yet. Draft governance documents on{" "}
-              <Link to="/family-governance" className="underline hover:text-kosha-navy">Family Governance</Link>{" "}
-              can be sent for Council or Assembly review.
+              You haven't requested any transitions yet. Governance documents, Representations,
+              Institutional Memory Records, Preparedness Records, and Dedications can all be sent
+              through this Maker-Checker path from their own workspaces.
             </p>
           )}
           {mine.map((g) => (
             <MineCard
               key={g.id}
               grant={g}
-              doc={docCtx[g.subject_entity_id]}
               checkerName={g.checker_participant_id ? people[g.checker_participant_id]?.display_name ?? "—" : null}
             />
           ))}
         </div>
       </div>
+      <p className="text-xs text-slate-grey">
+        <Link to="/family-governance" className="underline hover:text-kosha-navy">Family Governance</Link>
+        {" · "}
+        <Link to="/digital-legacy" className="underline hover:text-kosha-navy">Digital Legacy</Link>
+        {" · "}
+        <Link to="/institutional-memory" className="underline hover:text-kosha-navy">Institutional Memory</Link>
+        {" · "}
+        <Link to="/institutional-preparedness" className="underline hover:text-kosha-navy">Institutional Preparedness</Link>
+        {" · "}
+        <Link to="/philanthropy" className="underline hover:text-kosha-navy">Philanthropy</Link>
+      </p>
     </section>
   );
 }
 
-function DocLine({ doc }: { doc: DocContext | undefined }) {
-  if (!doc) return <div className="text-sm text-kosha-navy">Governance document</div>;
+function SubjectLine({ grant }: { grant: AccessGrant }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-widest text-slate-grey">{doc.document_type} · {doc.family_name}</div>
-      <div className="mt-xs font-display text-[20px] leading-[28px] text-kosha-navy">{doc.document_title}</div>
+      <div className="text-xs uppercase tracking-widest text-slate-grey">
+        {subjectTypeLabel(grant.subject_entity_type)}
+      </div>
+      <div className="mt-xs font-display text-[20px] leading-[28px] text-kosha-navy">
+        {grant.subject_label ?? "—"}
+      </div>
     </div>
   );
 }
 
 function PendingCard({
-  grant, doc, makerName, onDecided,
+  grant, makerName, onDecided,
 }: {
   grant: AccessGrant;
-  doc: DocContext | undefined;
   makerName: string;
   onDecided: () => Promise<void> | void;
 }) {
@@ -181,14 +157,14 @@ function PendingCard({
   return (
     <article className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="flex flex-wrap items-start justify-between gap-md">
-        <DocLine doc={doc} />
+        <SubjectLine grant={grant} />
         <div className="text-right text-xs text-slate-grey">
           <div>Requested by</div>
           <div className="mt-xs text-sm text-kosha-navy">{makerName}</div>
         </div>
       </div>
       <p className="mt-sm text-sm text-slate-grey">
-        Requested transition · <span className="text-kosha-navy">Activate</span>
+        Requested transition · <span className="text-kosha-navy">{transitionLabel(grant)}</span>
       </p>
 
       {message && <p className="mt-sm text-sm text-slate-grey">{message}</p>}
@@ -214,10 +190,7 @@ function PendingCard({
 
       {mode === "approve" && (
         <div className="mt-md rounded-md bg-vault-ivory p-md ring-1 ring-[color:var(--color-border-default)]">
-          <p className="text-sm text-kosha-navy">
-            Approving will make this document Active. If another {doc?.document_type ?? "document"} of the same type
-            is currently Active for this Family, it will be superseded — its history remains intact.
-          </p>
+          <ApprovalExplainer grant={grant} />
           <div className="mt-md flex flex-wrap gap-sm">
             <button
               type="button"
@@ -275,20 +248,73 @@ function PendingCard({
   );
 }
 
+function ApprovalExplainer({ grant }: { grant: AccessGrant }) {
+  const t = grant.requested_transition;
+  const type = grant.subject_entity_type;
+  if (type === "governance_document" && t === "Activate") {
+    return (
+      <p className="text-sm text-kosha-navy">
+        Approving will make this document Active. If another document of the same type is currently
+        Active for this Family, it will be superseded — its history remains intact.
+      </p>
+    );
+  }
+  if (type === "representation" && t === "Decide Disposition") {
+    return (
+      <p className="text-sm text-kosha-navy">
+        Approving records the Digital Executor's Disposition decision
+        {grant.requested_outcome ? <> · <span className="text-kosha-navy">{grant.requested_outcome}</span></> : null}.
+        Authorized Scope remains fixed; the underlying account is not touched by Koshagra.
+      </p>
+    );
+  }
+  if (type === "institutional_memory_record" && t === "Retire") {
+    return (
+      <p className="text-sm text-kosha-navy">
+        Approving retires this Institutional Memory Record. Its Curated rationale is preserved
+        unchanged — DM-0008 §4.4 forbids rewriting history — the record simply stops appearing
+        in active retrieval.
+      </p>
+    );
+  }
+  if (type === "preparedness_record" && t === "Retire") {
+    return (
+      <p className="text-sm text-kosha-navy">
+        Approving retires this Preparedness Category. The recognition remains in the audit trail;
+        the category is no longer maintained as an active provision to confirm.
+      </p>
+    );
+  }
+  if (type === "dedication" && t === "Conclude") {
+    return (
+      <p className="text-sm text-kosha-navy">
+        Approving records the Dedication's Conclusion. The Philanthropic Purpose is fixed and
+        remains on file — Conclusion recognises that the vehicle itself is being wound up
+        (DM-0006 §5.4).
+      </p>
+    );
+  }
+  return (
+    <p className="text-sm text-kosha-navy">
+      Approving records this transition against the subject. Underlying facts and history are preserved.
+    </p>
+  );
+}
+
 function MineCard({
-  grant, doc, checkerName,
+  grant, checkerName,
 }: {
-  grant: AccessGrant; doc: DocContext | undefined; checkerName: string | null;
+  grant: AccessGrant; checkerName: string | null;
 }) {
   const statusCopy = grant.grant_status === "Requested"
-    ? "Awaiting Council/Assembly review"
+    ? "Awaiting review"
     : grant.grant_status === "Granted"
     ? "Granted"
     : "Denied";
   return (
     <article className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="flex flex-wrap items-start justify-between gap-md">
-        <DocLine doc={doc} />
+        <SubjectLine grant={grant} />
         <div className="text-right">
           <span className="inline-flex items-center rounded-full bg-vault-ivory px-sm py-1 text-xs font-semibold text-slate-grey ring-1 ring-[color:var(--color-border-default)]">
             {statusCopy}
@@ -301,7 +327,7 @@ function MineCard({
         </div>
       </div>
       <p className="mt-sm text-sm text-slate-grey">
-        Requested transition · <span className="text-kosha-navy">Activate</span>
+        Requested transition · <span className="text-kosha-navy">{transitionLabel(grant)}</span>
       </p>
       {checkerName && (
         <p className="mt-xs text-xs text-slate-grey">Decided by · <span className="text-kosha-navy">{checkerName}</span></p>

@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { formatINR } from "@/lib/estate";
 import { useContinuitySubjects } from "@/lib/continuity-subjects";
+import { LinkParticipant } from "@/components/access/LinkParticipant";
+import { requestDedicationConclusion, useHasPendingRequest } from "@/lib/access-grants";
 
 export const Route = createFileRoute("/_authenticated/philanthropy")({
   component: PhilanthropyPage,
@@ -21,12 +23,13 @@ type Dedication = {
   philanthropic_purpose: string;
   vehicle: Vehicle | null;
   related_trust_id: string | null;
+  concluded_at: string | null;
   created_at: string;
   updated_at: string;
 };
 type Donor = { id: string; dedication_id: string; full_name: string; notes: string | null; created_at: string };
 type Steward = { id: string; dedication_id: string; full_name: string; source_of_authority_note: string | null; notes: string | null; created_at: string };
-type Enforcer = { id: string; dedication_id: string; full_name: string; scope_note: string | null; notes: string | null; created_at: string };
+type Enforcer = { id: string; dedication_id: string; full_name: string; scope_note: string | null; notes: string | null; linked_participant_id: string | null; created_at: string };
 type Grantee = { id: string; dedication_id: string; name: string; purpose_alignment_note: string | null; notes: string | null; created_at: string };
 type Distribution = { id: string; dedication_id: string; grantee_id: string; amount: number | string | null; distributed_date: string | null; alignment_note: string | null; notes: string | null; created_at: string };
 type ImpactRecord = { id: string; dedication_id: string; recorded_date: string | null; description: string; notes: string | null; created_at: string };
@@ -688,6 +691,12 @@ function EnforcersSection({ dedicationId }: { dedicationId: string }) {
             <div className="text-sm font-semibold text-kosha-navy">{e.full_name}</div>
             {e.scope_note && <p className="mt-xs text-sm text-slate-grey">{e.scope_note}</p>}
             {e.notes && <p className="mt-xs text-xs text-slate-grey">{e.notes}</p>}
+            <LinkParticipant
+              table="enforcers"
+              rowId={e.id}
+              linkedParticipantId={e.linked_participant_id}
+              onChanged={refresh}
+            />
           </li>
         ))}
       </ul>
@@ -964,6 +973,64 @@ function FidelityTab({ dedication }: { dedication: Dedication }) {
       />
       {section === "concerns" && <ConcernsSection dedicationId={dedication.id} />}
       {section === "reviews" && <ReviewsSection dedicationId={dedication.id} />}
+      <RequestConclusionCard dedication={dedication} />
+    </div>
+  );
+}
+
+function RequestConclusionCard({ dedication }: { dedication: Dedication }) {
+  const { participant } = useParticipant();
+  const { pending, refresh } = useHasPendingRequest(
+    participant?.id ?? null, "dedication", dedication.id, "Conclude",
+  );
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  if (dedication.concluded_at) {
+    return (
+      <div className={cardCls}>
+        <div className={labelCls}>Dedication concluded</div>
+        <div className="mt-xs font-numeral text-sm text-kosha-navy">{formatDate(dedication.concluded_at)}</div>
+        <p className="mt-sm text-xs text-slate-grey">
+          Concluded through Maker-Checker. The Philanthropic Purpose remains fixed and on file
+          (DM-0006 §5.4); Conclusion recognises that the vehicle itself is being wound up.
+        </p>
+      </div>
+    );
+  }
+
+  async function submit() {
+    if (!participant) return;
+    setBusy(true); setMessage(null);
+    const { error } = await requestDedicationConclusion(dedication.id, dedication.name, participant.id);
+    setBusy(false);
+    if (error) { setMessage(error.message || "Could not submit this request."); return; }
+    await refresh();
+  }
+
+  if (pending) {
+    return (
+      <div className={cardCls}>
+        <div className={labelCls}>Conclusion request pending</div>
+        <p className="mt-xs text-sm text-slate-grey">
+          An Enforcer linked to this Dedication can approve or deny on the Review workspace.
+          Purpose remains fixed regardless of the decision.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cardCls + " space-y-sm"}>
+      <h3 className="font-display text-[18px] leading-[26px] text-kosha-navy">Request Conclusion</h3>
+      <p className="text-xs text-slate-grey">
+        Conclusion recognises this vehicle is being wound up — never a redirection of Purpose,
+        which is fixed. An Enforcer of this Dedication (not a domain-wide Steward) must approve.
+      </p>
+      {message && <p className="text-sm text-slate-grey">{message}</p>}
+      <button type="button" onClick={submit} disabled={busy || !participant} className={primaryBtn}>
+        {busy ? "Submitting…" : "Send for Enforcer approval"}
+      </button>
     </div>
   );
 }
