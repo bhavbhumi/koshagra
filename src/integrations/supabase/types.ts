@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      assets: {
+        Row: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at: string
+          estate_id: string
+          estimated_value: number | null
+          id: string
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string
+          estate_id: string
+          estimated_value?: number | null
+          id?: string
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string
+          estate_id?: string
+          estimated_value?: number | null
+          id?: string
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_estate_id_fkey"
+            columns: ["estate_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       continuity_subjects: {
         Row: {
           created_at: string
@@ -52,6 +93,85 @@ export type Database = {
           },
         ]
       }
+      liabilities: {
+        Row: {
+          amount: number | null
+          created_at: string
+          estate_id: string
+          id: string
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          estate_id: string
+          id?: string
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          estate_id?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liabilities_estate_id_fkey"
+            columns: ["estate_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nominations: {
+        Row: {
+          created_at: string
+          estate_id: string
+          id: string
+          nominee_name: string
+          notes: string | null
+          relationship: string | null
+          role: Database["public"]["Enums"]["nomination_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estate_id: string
+          id?: string
+          nominee_name: string
+          notes?: string | null
+          relationship?: string | null
+          role: Database["public"]["Enums"]["nomination_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estate_id?: string
+          id?: string
+          nominee_name?: string
+          notes?: string | null
+          relationship?: string | null
+          role?: Database["public"]["Enums"]["nomination_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nominations_estate_id_fkey"
+            columns: ["estate_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           auth_user_id: string | null
@@ -85,14 +205,54 @@ export type Database = {
         }
         Relationships: []
       }
+      wills: {
+        Row: {
+          created_at: string
+          estate_id: string
+          executed_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["will_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estate_id: string
+          executed_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["will_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estate_id?: string
+          executed_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["will_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wills_estate_id_fkey"
+            columns: ["estate_id"]
+            isOneToOne: true
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      participant_owns_estate: {
+        Args: { _estate_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      asset_type: "Asset" | "Digital Asset"
+      nomination_role: "Executor" | "Guardian" | "Beneficiary"
       participant_type:
         | "Individual"
         | "Family"
@@ -105,6 +265,7 @@ export type Database = {
         | "Enterprise"
         | "Trust"
         | "Digital Legacy"
+      will_status: "Drafted" | "Executed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -232,6 +393,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      asset_type: ["Asset", "Digital Asset"],
+      nomination_role: ["Executor", "Guardian", "Beneficiary"],
       participant_type: [
         "Individual",
         "Family",
@@ -246,6 +409,7 @@ export const Constants = {
         "Trust",
         "Digital Legacy",
       ],
+      will_status: ["Drafted", "Executed"],
     },
   },
 } as const
