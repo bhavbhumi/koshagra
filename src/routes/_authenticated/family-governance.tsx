@@ -21,13 +21,21 @@ export const Route = createFileRoute("/_authenticated/family-governance")({
   component: FamilyGovernancePage,
 });
 
-type TabKey = "overview" | "members" | "documents" | "bodies";
+type TabKey = "overview" | "members" | "documents" | "bodies" | "timeline";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "members", label: "Members" },
   { key: "documents", label: "Governance Documents" },
   { key: "bodies", label: "Council & Assembly" },
+  { key: "timeline", label: "Timeline" },
 ];
+
+function formatEnInDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-IN", {
+    year: "numeric", month: "short", day: "2-digit",
+  });
+}
 
 function FamilyGovernancePage() {
   const { participant } = useParticipant();
@@ -119,10 +127,11 @@ function FamilyGovernancePage() {
     <section className="max-w-[72rem]">
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
-        {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} />}
+        {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} onNavigate={setTab} />}
         {tab === "members" && <MembersTab family={family} />}
         {tab === "documents" && <DocumentsTab family={family} participantId={participant?.id ?? null} />}
         {tab === "bodies" && <BodiesTab family={family} />}
+        {tab === "timeline" && <TimelineTab family={family} />}
       </div>
     </section>
   );
