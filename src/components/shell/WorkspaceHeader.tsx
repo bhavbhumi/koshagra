@@ -70,7 +70,7 @@ export function WorkspaceHeader({ participant }: { participant: ParticipantSumma
             {current?.name ?? "Koshagra"}
           </h1>
           {current && (
-            <p className="mt-xs max-w-3xl text-sm leading-[22px] text-slate-grey">
+            <p className="mt-xs max-w-[48rem] text-sm leading-[22px] text-slate-grey">
               {current.purpose}
             </p>
           )}
