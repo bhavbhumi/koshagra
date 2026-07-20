@@ -24,13 +24,21 @@ export const Route = createFileRoute("/_authenticated/estate-planning")({
   component: EstatePlanningPage,
 });
 
-type TabKey = "overview" | "will" | "register" | "nominations";
+type TabKey = "overview" | "will" | "register" | "nominations" | "timeline";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "will", label: "Will" },
   { key: "register", label: "Asset & Liability Register" },
   { key: "nominations", label: "Nominations" },
+  { key: "timeline", label: "Timeline" },
 ];
+
+function formatEnInDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-IN", {
+    year: "numeric", month: "short", day: "2-digit",
+  });
+}
 
 function EstatePlanningPage() {
   const { participant } = useParticipant();
@@ -74,10 +82,11 @@ function EstatePlanningPage() {
     <section className="max-w-[72rem]">
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
-        {tab === "overview" && <OverviewTab estate={estate} />}
+        {tab === "overview" && <OverviewTab estate={estate} onNavigate={setTab} />}
         {tab === "will" && <WillTab estate={estate} />}
         {tab === "register" && <RegisterTab estate={estate} />}
         {tab === "nominations" && <NominationsTab estate={estate} />}
+        {tab === "timeline" && <TimelineTab estate={estate} />}
       </div>
     </section>
   );
@@ -112,7 +121,7 @@ function TabBar({ tab, onChange }: { tab: TabKey; onChange: (t: TabKey) => void 
 
 /* ================= Overview ================= */
 
-function OverviewTab({ estate }: { estate: Estate }) {
+function OverviewTab({ estate, onNavigate }: { estate: Estate; onNavigate: (t: TabKey) => void }) {
   const { will } = useWill(estate.id);
   const { items: assets } = useAssets(estate.id);
   const { items: liabilities } = useLiabilities(estate.id);
@@ -127,12 +136,33 @@ function OverviewTab({ estate }: { estate: Estate }) {
     { Executor: 0, Guardian: 0, Beneficiary: 0 },
   );
 
+  const lastUpdatedIso = useMemo(() => {
+    const candidates: (string | null | undefined)[] = [
+      estate.updated_at, estate.created_at,
+      will?.updated_at, will?.created_at, will?.executed_at,
+      ...assets.flatMap((a) => [a.updated_at, a.created_at]),
+      ...liabilities.flatMap((l) => [l.updated_at, l.created_at]),
+      ...nominations.flatMap((n) => [n.updated_at, n.created_at]),
+    ];
+    const times = candidates
+      .filter((v): v is string => !!v)
+      .map((v) => new Date(v).getTime())
+      .filter((n) => Number.isFinite(n));
+    if (times.length === 0) return null;
+    return new Date(Math.max(...times)).toISOString();
+  }, [estate, will, assets, liabilities, nominations]);
+
   return (
     <div className="space-y-xl">
       <header>
         <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">{estate.name}</h2>
         {estate.purpose_description && (
           <p className="mt-xs max-w-[48rem] text-sm text-slate-grey">{estate.purpose_description}</p>
+        )}
+        {lastUpdatedIso && (
+          <p className="mt-xs text-xs text-slate-grey">
+            Last updated <span className="font-numeral">{formatEnInDate(lastUpdatedIso)}</span>
+          </p>
         )}
       </header>
 
@@ -142,7 +172,11 @@ function OverviewTab({ estate }: { estate: Estate }) {
         <StatCard label="Will" value={will?.status ?? "—"} numeric={false} />
         <StatCard label="Assets" value={assets.length} />
         <StatCard label="Liabilities" value={liabilities.length} />
-        <StatCard label="Executors" value={roleCounts.Executor} />
+        <StatCard
+          label="Executors"
+          value={roleCounts.Executor}
+          note={roleCounts.Executor === 0 ? { text: "No Executor nominated yet", onClick: () => onNavigate("nominations") } : null}
+        />
         <StatCard label="Guardians" value={roleCounts.Guardian} />
         <StatCard label="Beneficiaries" value={roleCounts.Beneficiary} />
       </div>
@@ -186,13 +220,25 @@ function LifecycleStrip({ current }: { current: LifecycleStage }) {
   );
 }
 
-function StatCard({ label, value, numeric = true }: { label: string; value: number | string; numeric?: boolean }) {
+function StatCard({ label, value, numeric = true, note = null }: {
+  label: string; value: number | string; numeric?: boolean;
+  note?: { text: string; onClick: () => void } | null;
+}) {
   return (
     <div className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="text-xs uppercase tracking-widest text-slate-grey">{label}</div>
       <div className={"mt-xs text-kosha-navy " + (numeric ? "font-numeral text-[28px] leading-[36px]" : "font-display text-[20px] leading-[28px]")}>
         {value}
       </div>
+      {note && (
+        <button
+          type="button"
+          onClick={note.onClick}
+          className="mt-xs block text-left text-xs text-slate-grey underline underline-offset-2 hover:text-kosha-navy"
+        >
+          {note.text}
+        </button>
+      )}
     </div>
   );
 }
@@ -768,6 +814,49 @@ function FormActions({ onCancel, busy }: { onCancel: () => void; busy: boolean }
         className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40">
         {busy ? "Saving…" : "Save"}
       </button>
+    </div>
+  );
+}
+
+/* ================= Timeline ================= */
+
+type TimelineEntry = { at: string; label: string };
+
+function TimelineTab({ estate }: { estate: Estate }) {
+  const { will } = useWill(estate.id);
+  const { items: assets } = useAssets(estate.id);
+  const { items: liabilities } = useLiabilities(estate.id);
+  const { items: nominations } = useNominations(estate.id);
+
+  const entries = useMemo<TimelineEntry[]>(() => {
+    const out: TimelineEntry[] = [];
+    out.push({ at: estate.created_at, label: "Estate created" });
+    if (will?.created_at) out.push({ at: will.created_at, label: "Will started" });
+    if (will?.executed_at) out.push({ at: will.executed_at, label: "Will marked Executed" });
+    for (const a of assets) out.push({ at: a.created_at, label: `Asset added: ${a.name}` });
+    for (const l of liabilities) out.push({ at: l.created_at, label: `Liability added: ${l.name}` });
+    for (const n of nominations) {
+      out.push({ at: n.created_at, label: `Nomination recorded: ${n.nominee_name} as ${n.role}` });
+    }
+    return out.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  }, [estate, will, assets, liabilities, nominations]);
+
+  return (
+    <div className="max-w-[48rem]">
+      <p className="text-sm text-slate-grey">
+        Every recorded event for this Estate, most recent first.
+      </p>
+      <ol className="mt-md space-y-xs">
+        {entries.map((e, i) => (
+          <li
+            key={i}
+            className="flex flex-wrap items-baseline justify-between gap-md rounded-md bg-pure-white px-md py-3 shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]"
+          >
+            <span className="text-sm text-kosha-navy">{e.label}</span>
+            <span className="font-numeral text-xs text-slate-grey">{formatEnInDate(e.at)}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

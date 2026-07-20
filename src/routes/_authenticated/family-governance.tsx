@@ -21,13 +21,21 @@ export const Route = createFileRoute("/_authenticated/family-governance")({
   component: FamilyGovernancePage,
 });
 
-type TabKey = "overview" | "members" | "documents" | "bodies";
+type TabKey = "overview" | "members" | "documents" | "bodies" | "timeline";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "members", label: "Members" },
   { key: "documents", label: "Governance Documents" },
   { key: "bodies", label: "Council & Assembly" },
+  { key: "timeline", label: "Timeline" },
 ];
+
+function formatEnInDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-IN", {
+    year: "numeric", month: "short", day: "2-digit",
+  });
+}
 
 function FamilyGovernancePage() {
   const { participant } = useParticipant();
@@ -119,10 +127,11 @@ function FamilyGovernancePage() {
     <section className="max-w-[72rem]">
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
-        {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} />}
+        {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} onNavigate={setTab} />}
         {tab === "members" && <MembersTab family={family} />}
         {tab === "documents" && <DocumentsTab family={family} participantId={participant?.id ?? null} />}
         {tab === "bodies" && <BodiesTab family={family} />}
+        {tab === "timeline" && <TimelineTab family={family} />}
       </div>
     </section>
   );
@@ -157,7 +166,9 @@ function TabBar({ tab, onChange }: { tab: TabKey; onChange: (t: TabKey) => void 
 
 /* ================= Overview ================= */
 
-function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFamily: () => Promise<void> | void }) {
+function OverviewTab({ family, onRefreshFamily, onNavigate }: {
+  family: Family; onRefreshFamily: () => Promise<void> | void; onNavigate: (t: TabKey) => void;
+}) {
   const { items: members } = useFamilyMembers(family.id);
   const { items: docs } = useGovernanceDocuments(family.id);
   const { items: seats } = useGovernanceBodyMembers(family.id);
@@ -173,6 +184,21 @@ function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFam
   const councilSeats = seats.filter((s) => s.body === "Council").length;
   const assemblySeats = seats.filter((s) => s.body === "Assembly").length;
 
+  const lastUpdatedIso = useMemo(() => {
+    const candidates: (string | null | undefined)[] = [
+      family.updated_at, family.created_at,
+      ...members.flatMap((m) => [m.created_at]),
+      ...docs.flatMap((d) => [d.updated_at, d.created_at]),
+      ...seats.flatMap((s) => [s.created_at]),
+    ];
+    const times = candidates
+      .filter((v): v is string => !!v)
+      .map((v) => new Date(v).getTime())
+      .filter((n) => Number.isFinite(n));
+    if (times.length === 0) return null;
+    return new Date(Math.max(...times)).toISOString();
+  }, [family, members, docs, seats]);
+
   return (
     <div className="space-y-xl">
       <header>
@@ -184,6 +210,11 @@ function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFam
           onDone={async () => { setEditing(false); await onRefreshFamily(); }}
           onCancel={() => setEditing(false)}
         />
+        {lastUpdatedIso && (
+          <p className="mt-xs text-xs text-slate-grey">
+            Last updated <span className="font-numeral">{formatEnInDate(lastUpdatedIso)}</span>
+          </p>
+        )}
       </header>
 
       <div>
@@ -191,8 +222,16 @@ function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFam
         <div className="mt-sm grid grid-cols-2 gap-md sm:grid-cols-3 lg:grid-cols-4">
           <StatCard label="Members · Active" value={active} />
           <StatCard label="Members · Suspended" value={suspended} />
-          <StatCard label="Council seats" value={councilSeats} />
-          <StatCard label="Assembly seats" value={assemblySeats} />
+          <StatCard
+            label="Council seats"
+            value={councilSeats}
+            note={councilSeats === 0 ? { text: "No seats recorded yet", onClick: () => onNavigate("bodies") } : null}
+          />
+          <StatCard
+            label="Assembly seats"
+            value={assemblySeats}
+            note={assemblySeats === 0 ? { text: "No seats recorded yet", onClick: () => onNavigate("bodies") } : null}
+          />
           {countsByType.map((c) => (
             <StatCard
               key={c.type}
@@ -284,13 +323,25 @@ function PurposeBlock({
   );
 }
 
-function StatCard({ label, value, numeric = true }: { label: string; value: number | string; numeric?: boolean }) {
+function StatCard({ label, value, numeric = true, note = null }: {
+  label: string; value: number | string; numeric?: boolean;
+  note?: { text: string; onClick: () => void } | null;
+}) {
   return (
     <div className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="text-xs uppercase tracking-widest text-slate-grey">{label}</div>
       <div className={"mt-xs text-kosha-navy " + (numeric ? "font-numeral text-[28px] leading-[36px]" : "font-display text-[20px] leading-[28px]")}>
         {value}
       </div>
+      {note && (
+        <button
+          type="button"
+          onClick={note.onClick}
+          className="mt-xs block text-left text-xs text-slate-grey underline underline-offset-2 hover:text-kosha-navy"
+        >
+          {note.text}
+        </button>
+      )}
     </div>
   );
 }
@@ -1050,5 +1101,52 @@ function SeatForm({
         </button>
       </div>
     </form>
+  );
+}
+
+/* ================= Timeline ================= */
+
+type TimelineEntry = { at: string; label: string };
+
+function TimelineTab({ family }: { family: Family }) {
+  const { items: members } = useFamilyMembers(family.id);
+  const { items: docs } = useGovernanceDocuments(family.id);
+  const { items: seats } = useGovernanceBodyMembers(family.id);
+
+  const seatedName = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const m of members) map.set(m.id, m.full_name);
+    return map;
+  }, [members]);
+
+  const entries = useMemo<TimelineEntry[]>(() => {
+    const out: TimelineEntry[] = [];
+    out.push({ at: family.created_at, label: "Family created" });
+    for (const m of members) out.push({ at: m.created_at, label: `Family Member added: ${m.full_name}` });
+    for (const d of docs) out.push({ at: d.created_at, label: `${d.document_type} drafted: ${d.title}` });
+    for (const s of seats) {
+      const name = seatedName.get(s.family_member_id) ?? "A Family Member";
+      out.push({ at: s.created_at, label: `${name} seated on the ${s.body}` });
+    }
+    return out.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  }, [family, members, docs, seats, seatedName]);
+
+  return (
+    <div className="max-w-[48rem]">
+      <p className="text-sm text-slate-grey">
+        Every recorded event for this Family, most recent first.
+      </p>
+      <ol className="mt-md space-y-xs">
+        {entries.map((e, i) => (
+          <li
+            key={i}
+            className="flex flex-wrap items-baseline justify-between gap-md rounded-md bg-pure-white px-md py-3 shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]"
+          >
+            <span className="text-sm text-kosha-navy">{e.label}</span>
+            <span className="font-numeral text-xs text-slate-grey">{formatEnInDate(e.at)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
