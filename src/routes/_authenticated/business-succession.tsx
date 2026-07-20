@@ -949,7 +949,7 @@ function DocumentForm({
   onCancel: () => void;
   onCreated: () => void;
 }) {
-  const [title, setTitle] = useState(documentType);
+  const [title, setTitle] = useState<string>(documentType);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
