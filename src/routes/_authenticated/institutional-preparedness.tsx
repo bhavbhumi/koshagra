@@ -1,3 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WorkspacePlaceholder } from "@/components/shell/WorkspacePlaceholder";
-export const Route = createFileRoute("/_authenticated/institutional-preparedness")({ component: WorkspacePlaceholder });
+import { InstitutionalPreparednessPage } from "@/components/institutional-preparedness/InstitutionalPreparednessPage";
+export const Route = createFileRoute("/_authenticated/institutional-preparedness")({
+  component: InstitutionalPreparednessPage,
+});
