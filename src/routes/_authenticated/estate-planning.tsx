@@ -18,7 +18,6 @@ import {
   type Estate,
   type LifecycleStage,
   type NominationRole,
-  type Will,
 } from "@/lib/estate";
 
 export const Route = createFileRoute("/_authenticated/estate-planning")({
@@ -772,6 +771,3 @@ function FormActions({ onCancel, busy }: { onCancel: () => void; busy: boolean }
     </div>
   );
 }
-
-// Type-only re-exports kept implicit — Will is used via useWill's inferred return.
-export type { Will };
