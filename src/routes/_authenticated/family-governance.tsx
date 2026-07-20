@@ -1103,3 +1103,50 @@ function SeatForm({
     </form>
   );
 }
+
+/* ================= Timeline ================= */
+
+type TimelineEntry = { at: string; label: string };
+
+function TimelineTab({ family }: { family: Family }) {
+  const { items: members } = useFamilyMembers(family.id);
+  const { items: docs } = useGovernanceDocuments(family.id);
+  const { items: seats } = useGovernanceBodyMembers(family.id);
+
+  const seatedName = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const m of members) map.set(m.id, m.full_name);
+    return map;
+  }, [members]);
+
+  const entries = useMemo<TimelineEntry[]>(() => {
+    const out: TimelineEntry[] = [];
+    out.push({ at: family.created_at, label: "Family created" });
+    for (const m of members) out.push({ at: m.created_at, label: `Family Member added: ${m.full_name}` });
+    for (const d of docs) out.push({ at: d.created_at, label: `${d.document_type} drafted: ${d.title}` });
+    for (const s of seats) {
+      const name = seatedName.get(s.family_member_id) ?? "A Family Member";
+      out.push({ at: s.created_at, label: `${name} seated on the ${s.body}` });
+    }
+    return out.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  }, [family, members, docs, seats, seatedName]);
+
+  return (
+    <div className="max-w-[48rem]">
+      <p className="text-sm text-slate-grey">
+        Every recorded event for this Family, most recent first.
+      </p>
+      <ol className="mt-md space-y-xs">
+        {entries.map((e, i) => (
+          <li
+            key={i}
+            className="flex flex-wrap items-baseline justify-between gap-md rounded-md bg-pure-white px-md py-3 shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]"
+          >
+            <span className="text-sm text-kosha-navy">{e.label}</span>
+            <span className="font-numeral text-xs text-slate-grey">{formatEnInDate(e.at)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
