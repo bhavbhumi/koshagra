@@ -370,6 +370,44 @@ export type Database = {
           },
         ]
       }
+      digital_executors: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          owner_participant_id: string
+          source_of_authority_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          owner_participant_id: string
+          source_of_authority_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          owner_participant_id?: string
+          source_of_authority_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_executors_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distributions: {
         Row: {
           alignment_note: string | null
@@ -850,6 +888,38 @@ export type Database = {
           },
         ]
       }
+      monitoring_checks: {
+        Row: {
+          checked_at: string
+          created_at: string
+          id: string
+          note: string | null
+          representation_id: string
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          representation_id: string
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          representation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_checks_representation_id_fkey"
+            columns: ["representation_id"]
+            isOneToOne: false
+            referencedRelation: "representations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nominations: {
         Row: {
           created_at: string
@@ -1155,6 +1225,106 @@ export type Database = {
           },
         ]
       }
+      representation_concerns: {
+        Row: {
+          concern_type: Database["public"]["Enums"]["representation_concern_type"]
+          created_at: string
+          description: string
+          id: string
+          raised_at: string
+          representation_id: string
+          resolution_note: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["representation_concern_status"]
+        }
+        Insert: {
+          concern_type: Database["public"]["Enums"]["representation_concern_type"]
+          created_at?: string
+          description: string
+          id?: string
+          raised_at?: string
+          representation_id: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["representation_concern_status"]
+        }
+        Update: {
+          concern_type?: Database["public"]["Enums"]["representation_concern_type"]
+          created_at?: string
+          description?: string
+          id?: string
+          raised_at?: string
+          representation_id?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["representation_concern_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "representation_concerns_representation_id_fkey"
+            columns: ["representation_id"]
+            isOneToOne: false
+            referencedRelation: "representations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      representations: {
+        Row: {
+          authorized_scope: string
+          created_at: string
+          id: string
+          name: string
+          owner_participant_id: string
+          platform_or_custodian: string | null
+          representation_type: Database["public"]["Enums"]["representation_type"]
+          transition_note: string | null
+          transition_trigger_type:
+            | Database["public"]["Enums"]["transition_trigger_type"]
+            | null
+          transition_triggered_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          authorized_scope: string
+          created_at?: string
+          id?: string
+          name: string
+          owner_participant_id: string
+          platform_or_custodian?: string | null
+          representation_type: Database["public"]["Enums"]["representation_type"]
+          transition_note?: string | null
+          transition_trigger_type?:
+            | Database["public"]["Enums"]["transition_trigger_type"]
+            | null
+          transition_triggered_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          authorized_scope?: string
+          created_at?: string
+          id?: string
+          name?: string
+          owner_participant_id?: string
+          platform_or_custodian?: string | null
+          representation_type?: Database["public"]["Enums"]["representation_type"]
+          transition_note?: string | null
+          transition_trigger_type?:
+            | Database["public"]["Enums"]["transition_trigger_type"]
+            | null
+          transition_triggered_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "representations_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       settlors: {
         Row: {
           created_at: string
@@ -1422,6 +1592,10 @@ export type Database = {
         Args: { _family_id: string }
         Returns: boolean
       }
+      participant_owns_representation: {
+        Args: { _representation_id: string }
+        Returns: boolean
+      }
       participant_owns_trust: { Args: { _trust_id: string }; Returns: boolean }
     }
     Enums: {
@@ -1452,6 +1626,12 @@ export type Database = {
         | "Institution"
         | "Professional"
         | "AI Agent"
+      representation_concern_status: "Active" | "Resolved"
+      representation_concern_type:
+        | "Compromise"
+        | "Authority Ambiguity"
+        | "Other"
+      representation_type: "Digital Identity" | "AI Agent" | "Cryptographic Key"
       subject_type:
         | "Estate"
         | "Family"
@@ -1459,6 +1639,12 @@ export type Database = {
         | "Trust"
         | "Digital Legacy"
       successor_type: "Leadership" | "Ownership"
+      transition_trigger_type:
+        | "Incapacity"
+        | "Death"
+        | "Dormancy"
+        | "Unauthorized Continuation"
+        | "Other"
       trustee_role: "Trustee" | "Successor Trustee"
       will_status: "Drafted" | "Executed"
     }
@@ -1621,6 +1807,17 @@ export const Constants = {
         "Professional",
         "AI Agent",
       ],
+      representation_concern_status: ["Active", "Resolved"],
+      representation_concern_type: [
+        "Compromise",
+        "Authority Ambiguity",
+        "Other",
+      ],
+      representation_type: [
+        "Digital Identity",
+        "AI Agent",
+        "Cryptographic Key",
+      ],
       subject_type: [
         "Estate",
         "Family",
@@ -1629,6 +1826,13 @@ export const Constants = {
         "Digital Legacy",
       ],
       successor_type: ["Leadership", "Ownership"],
+      transition_trigger_type: [
+        "Incapacity",
+        "Death",
+        "Dormancy",
+        "Unauthorized Continuation",
+        "Other",
+      ],
       trustee_role: ["Trustee", "Successor Trustee"],
       will_status: ["Drafted", "Executed"],
     },
