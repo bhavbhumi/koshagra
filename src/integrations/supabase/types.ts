@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      continuity_subjects: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_participant_id: string
+          purpose_description: string | null
+          subject_type: Database["public"]["Enums"]["subject_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_participant_id: string
+          purpose_description?: string | null
+          subject_type: Database["public"]["Enums"]["subject_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_participant_id?: string
+          purpose_description?: string | null
+          subject_type?: Database["public"]["Enums"]["subject_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "continuity_subjects_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           auth_user_id: string | null
@@ -61,6 +99,12 @@ export type Database = {
         | "Institution"
         | "Professional"
         | "AI Agent"
+      subject_type:
+        | "Estate"
+        | "Family"
+        | "Enterprise"
+        | "Trust"
+        | "Digital Legacy"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -194,6 +238,13 @@ export const Constants = {
         "Institution",
         "Professional",
         "AI Agent",
+      ],
+      subject_type: [
+        "Estate",
+        "Family",
+        "Enterprise",
+        "Trust",
+        "Digital Legacy",
       ],
     },
   },
