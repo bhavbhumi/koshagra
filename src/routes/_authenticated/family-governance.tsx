@@ -166,7 +166,9 @@ function TabBar({ tab, onChange }: { tab: TabKey; onChange: (t: TabKey) => void 
 
 /* ================= Overview ================= */
 
-function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFamily: () => Promise<void> | void }) {
+function OverviewTab({ family, onRefreshFamily, onNavigate }: {
+  family: Family; onRefreshFamily: () => Promise<void> | void; onNavigate: (t: TabKey) => void;
+}) {
   const { items: members } = useFamilyMembers(family.id);
   const { items: docs } = useGovernanceDocuments(family.id);
   const { items: seats } = useGovernanceBodyMembers(family.id);
@@ -182,6 +184,21 @@ function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFam
   const councilSeats = seats.filter((s) => s.body === "Council").length;
   const assemblySeats = seats.filter((s) => s.body === "Assembly").length;
 
+  const lastUpdatedIso = useMemo(() => {
+    const candidates: (string | null | undefined)[] = [
+      family.updated_at, family.created_at,
+      ...members.flatMap((m) => [m.created_at]),
+      ...docs.flatMap((d) => [d.updated_at, d.created_at]),
+      ...seats.flatMap((s) => [s.created_at]),
+    ];
+    const times = candidates
+      .filter((v): v is string => !!v)
+      .map((v) => new Date(v).getTime())
+      .filter((n) => Number.isFinite(n));
+    if (times.length === 0) return null;
+    return new Date(Math.max(...times)).toISOString();
+  }, [family, members, docs, seats]);
+
   return (
     <div className="space-y-xl">
       <header>
@@ -193,6 +210,11 @@ function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFam
           onDone={async () => { setEditing(false); await onRefreshFamily(); }}
           onCancel={() => setEditing(false)}
         />
+        {lastUpdatedIso && (
+          <p className="mt-xs text-xs text-slate-grey">
+            Last updated <span className="font-numeral">{formatEnInDate(lastUpdatedIso)}</span>
+          </p>
+        )}
       </header>
 
       <div>
@@ -200,8 +222,16 @@ function OverviewTab({ family, onRefreshFamily }: { family: Family; onRefreshFam
         <div className="mt-sm grid grid-cols-2 gap-md sm:grid-cols-3 lg:grid-cols-4">
           <StatCard label="Members · Active" value={active} />
           <StatCard label="Members · Suspended" value={suspended} />
-          <StatCard label="Council seats" value={councilSeats} />
-          <StatCard label="Assembly seats" value={assemblySeats} />
+          <StatCard
+            label="Council seats"
+            value={councilSeats}
+            note={councilSeats === 0 ? { text: "No seats recorded yet", onClick: () => onNavigate("bodies") } : null}
+          />
+          <StatCard
+            label="Assembly seats"
+            value={assemblySeats}
+            note={assemblySeats === 0 ? { text: "No seats recorded yet", onClick: () => onNavigate("bodies") } : null}
+          />
           {countsByType.map((c) => (
             <StatCard
               key={c.type}
@@ -293,13 +323,25 @@ function PurposeBlock({
   );
 }
 
-function StatCard({ label, value, numeric = true }: { label: string; value: number | string; numeric?: boolean }) {
+function StatCard({ label, value, numeric = true, note = null }: {
+  label: string; value: number | string; numeric?: boolean;
+  note?: { text: string; onClick: () => void } | null;
+}) {
   return (
     <div className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="text-xs uppercase tracking-widest text-slate-grey">{label}</div>
       <div className={"mt-xs text-kosha-navy " + (numeric ? "font-numeral text-[28px] leading-[36px]" : "font-display text-[20px] leading-[28px]")}>
         {value}
       </div>
+      {note && (
+        <button
+          type="button"
+          onClick={note.onClick}
+          className="mt-xs block text-left text-xs text-slate-grey underline underline-offset-2 hover:text-kosha-navy"
+        >
+          {note.text}
+        </button>
+      )}
     </div>
   );
 }
