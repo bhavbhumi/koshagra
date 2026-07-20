@@ -15,6 +15,7 @@ import {
   type GovernanceDocument,
   type GovernanceDocumentType,
 } from "@/lib/family";
+import { findParticipantByEmail, requestActivation, type AccessGrant } from "@/lib/access-grants";
 
 export const Route = createFileRoute("/_authenticated/family-governance")({
   component: FamilyGovernancePage,
@@ -120,7 +121,7 @@ function FamilyGovernancePage() {
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} />}
         {tab === "members" && <MembersTab family={family} />}
-        {tab === "documents" && <DocumentsTab family={family} />}
+        {tab === "documents" && <DocumentsTab family={family} participantId={participant?.id ?? null} />}
         {tab === "bodies" && <BodiesTab family={family} />}
       </div>
     </section>
