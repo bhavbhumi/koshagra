@@ -113,6 +113,14 @@ export const WORKSPACES: Workspace[] = [
     kind: "utility",
   },
   {
+    slug: "institution-registry",
+    path: "/institution-registry",
+    name: "Institution Registry",
+    purpose:
+      "Every Continuity Subject you steward — Estate, Family, Enterprise, Trust, or Digital Legacy — in one place.",
+    kind: "utility",
+  },
+  {
     slug: "notifications",
     path: "/notifications",
     name: "Notification Center",
