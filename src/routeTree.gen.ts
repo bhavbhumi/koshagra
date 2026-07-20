@@ -10,11 +10,41 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StyleGuideRouteImport } from './routes/style-guide'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTrustAdministrationRouteImport } from './routes/_authenticated/trust-administration'
+import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
+import { Route as AuthenticatedPhilanthropyRouteImport } from './routes/_authenticated/philanthropy'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedInstitutionalPreparednessRouteImport } from './routes/_authenticated/institutional-preparedness'
+import { Route as AuthenticatedInstitutionalMemoryRouteImport } from './routes/_authenticated/institutional-memory'
+import { Route as AuthenticatedInstitutionalCoordinationRouteImport } from './routes/_authenticated/institutional-coordination'
+import { Route as AuthenticatedFamilyGovernanceRouteImport } from './routes/_authenticated/family-governance'
+import { Route as AuthenticatedEstatePlanningRouteImport } from './routes/_authenticated/estate-planning'
+import { Route as AuthenticatedDigitalLegacyRouteImport } from './routes/_authenticated/digital-legacy'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedBusinessSuccessionRouteImport } from './routes/_authenticated/business-succession'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const StyleGuideRoute = StyleGuideRouteImport.update({
   id: '/style-guide',
   path: '/style-guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +52,207 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTrustAdministrationRoute =
+  AuthenticatedTrustAdministrationRouteImport.update({
+    id: '/trust-administration',
+    path: '/trust-administration',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPhilanthropyRoute =
+  AuthenticatedPhilanthropyRouteImport.update({
+    id: '/philanthropy',
+    path: '/philanthropy',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInstitutionalPreparednessRoute =
+  AuthenticatedInstitutionalPreparednessRouteImport.update({
+    id: '/institutional-preparedness',
+    path: '/institutional-preparedness',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInstitutionalMemoryRoute =
+  AuthenticatedInstitutionalMemoryRouteImport.update({
+    id: '/institutional-memory',
+    path: '/institutional-memory',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInstitutionalCoordinationRoute =
+  AuthenticatedInstitutionalCoordinationRouteImport.update({
+    id: '/institutional-coordination',
+    path: '/institutional-coordination',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFamilyGovernanceRoute =
+  AuthenticatedFamilyGovernanceRouteImport.update({
+    id: '/family-governance',
+    path: '/family-governance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEstatePlanningRoute =
+  AuthenticatedEstatePlanningRouteImport.update({
+    id: '/estate-planning',
+    path: '/estate-planning',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDigitalLegacyRoute =
+  AuthenticatedDigitalLegacyRouteImport.update({
+    id: '/digital-legacy',
+    path: '/digital-legacy',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBusinessSuccessionRoute =
+  AuthenticatedBusinessSuccessionRouteImport.update({
+    id: '/business-succession',
+    path: '/business-succession',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/style-guide': typeof StyleGuideRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/business-succession': typeof AuthenticatedBusinessSuccessionRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/digital-legacy': typeof AuthenticatedDigitalLegacyRoute
+  '/estate-planning': typeof AuthenticatedEstatePlanningRoute
+  '/family-governance': typeof AuthenticatedFamilyGovernanceRoute
+  '/institutional-coordination': typeof AuthenticatedInstitutionalCoordinationRoute
+  '/institutional-memory': typeof AuthenticatedInstitutionalMemoryRoute
+  '/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/philanthropy': typeof AuthenticatedPhilanthropyRoute
+  '/search': typeof AuthenticatedSearchRoute
+  '/trust-administration': typeof AuthenticatedTrustAdministrationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/style-guide': typeof StyleGuideRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/business-succession': typeof AuthenticatedBusinessSuccessionRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/digital-legacy': typeof AuthenticatedDigitalLegacyRoute
+  '/estate-planning': typeof AuthenticatedEstatePlanningRoute
+  '/family-governance': typeof AuthenticatedFamilyGovernanceRoute
+  '/institutional-coordination': typeof AuthenticatedInstitutionalCoordinationRoute
+  '/institutional-memory': typeof AuthenticatedInstitutionalMemoryRoute
+  '/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/philanthropy': typeof AuthenticatedPhilanthropyRoute
+  '/search': typeof AuthenticatedSearchRoute
+  '/trust-administration': typeof AuthenticatedTrustAdministrationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/style-guide': typeof StyleGuideRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/business-succession': typeof AuthenticatedBusinessSuccessionRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/digital-legacy': typeof AuthenticatedDigitalLegacyRoute
+  '/_authenticated/estate-planning': typeof AuthenticatedEstatePlanningRoute
+  '/_authenticated/family-governance': typeof AuthenticatedFamilyGovernanceRoute
+  '/_authenticated/institutional-coordination': typeof AuthenticatedInstitutionalCoordinationRoute
+  '/_authenticated/institutional-memory': typeof AuthenticatedInstitutionalMemoryRoute
+  '/_authenticated/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/philanthropy': typeof AuthenticatedPhilanthropyRoute
+  '/_authenticated/search': typeof AuthenticatedSearchRoute
+  '/_authenticated/trust-administration': typeof AuthenticatedTrustAdministrationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/style-guide'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/style-guide'
+    | '/admin'
+    | '/business-succession'
+    | '/dashboard'
+    | '/digital-legacy'
+    | '/estate-planning'
+    | '/family-governance'
+    | '/institutional-coordination'
+    | '/institutional-memory'
+    | '/institutional-preparedness'
+    | '/notifications'
+    | '/philanthropy'
+    | '/search'
+    | '/trust-administration'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/style-guide'
-  id: '__root__' | '/' | '/style-guide'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/style-guide'
+    | '/admin'
+    | '/business-succession'
+    | '/dashboard'
+    | '/digital-legacy'
+    | '/estate-planning'
+    | '/family-governance'
+    | '/institutional-coordination'
+    | '/institutional-memory'
+    | '/institutional-preparedness'
+    | '/notifications'
+    | '/philanthropy'
+    | '/search'
+    | '/trust-administration'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/style-guide'
+    | '/_authenticated/admin'
+    | '/_authenticated/business-succession'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/digital-legacy'
+    | '/_authenticated/estate-planning'
+    | '/_authenticated/family-governance'
+    | '/_authenticated/institutional-coordination'
+    | '/_authenticated/institutional-memory'
+    | '/_authenticated/institutional-preparedness'
+    | '/_authenticated/notifications'
+    | '/_authenticated/philanthropy'
+    | '/_authenticated/search'
+    | '/_authenticated/trust-administration'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   StyleGuideRoute: typeof StyleGuideRoute
 }
 
@@ -58,6 +265,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StyleGuideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +293,142 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/trust-administration': {
+      id: '/_authenticated/trust-administration'
+      path: '/trust-administration'
+      fullPath: '/trust-administration'
+      preLoaderRoute: typeof AuthenticatedTrustAdministrationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/search': {
+      id: '/_authenticated/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AuthenticatedSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/philanthropy': {
+      id: '/_authenticated/philanthropy'
+      path: '/philanthropy'
+      fullPath: '/philanthropy'
+      preLoaderRoute: typeof AuthenticatedPhilanthropyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/institutional-preparedness': {
+      id: '/_authenticated/institutional-preparedness'
+      path: '/institutional-preparedness'
+      fullPath: '/institutional-preparedness'
+      preLoaderRoute: typeof AuthenticatedInstitutionalPreparednessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/institutional-memory': {
+      id: '/_authenticated/institutional-memory'
+      path: '/institutional-memory'
+      fullPath: '/institutional-memory'
+      preLoaderRoute: typeof AuthenticatedInstitutionalMemoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/institutional-coordination': {
+      id: '/_authenticated/institutional-coordination'
+      path: '/institutional-coordination'
+      fullPath: '/institutional-coordination'
+      preLoaderRoute: typeof AuthenticatedInstitutionalCoordinationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/family-governance': {
+      id: '/_authenticated/family-governance'
+      path: '/family-governance'
+      fullPath: '/family-governance'
+      preLoaderRoute: typeof AuthenticatedFamilyGovernanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/estate-planning': {
+      id: '/_authenticated/estate-planning'
+      path: '/estate-planning'
+      fullPath: '/estate-planning'
+      preLoaderRoute: typeof AuthenticatedEstatePlanningRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/digital-legacy': {
+      id: '/_authenticated/digital-legacy'
+      path: '/digital-legacy'
+      fullPath: '/digital-legacy'
+      preLoaderRoute: typeof AuthenticatedDigitalLegacyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/business-succession': {
+      id: '/_authenticated/business-succession'
+      path: '/business-succession'
+      fullPath: '/business-succession'
+      preLoaderRoute: typeof AuthenticatedBusinessSuccessionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedBusinessSuccessionRoute: typeof AuthenticatedBusinessSuccessionRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDigitalLegacyRoute: typeof AuthenticatedDigitalLegacyRoute
+  AuthenticatedEstatePlanningRoute: typeof AuthenticatedEstatePlanningRoute
+  AuthenticatedFamilyGovernanceRoute: typeof AuthenticatedFamilyGovernanceRoute
+  AuthenticatedInstitutionalCoordinationRoute: typeof AuthenticatedInstitutionalCoordinationRoute
+  AuthenticatedInstitutionalMemoryRoute: typeof AuthenticatedInstitutionalMemoryRoute
+  AuthenticatedInstitutionalPreparednessRoute: typeof AuthenticatedInstitutionalPreparednessRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPhilanthropyRoute: typeof AuthenticatedPhilanthropyRoute
+  AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
+  AuthenticatedTrustAdministrationRoute: typeof AuthenticatedTrustAdministrationRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedBusinessSuccessionRoute: AuthenticatedBusinessSuccessionRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDigitalLegacyRoute: AuthenticatedDigitalLegacyRoute,
+  AuthenticatedEstatePlanningRoute: AuthenticatedEstatePlanningRoute,
+  AuthenticatedFamilyGovernanceRoute: AuthenticatedFamilyGovernanceRoute,
+  AuthenticatedInstitutionalCoordinationRoute:
+    AuthenticatedInstitutionalCoordinationRoute,
+  AuthenticatedInstitutionalMemoryRoute: AuthenticatedInstitutionalMemoryRoute,
+  AuthenticatedInstitutionalPreparednessRoute:
+    AuthenticatedInstitutionalPreparednessRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedPhilanthropyRoute: AuthenticatedPhilanthropyRoute,
+  AuthenticatedSearchRoute: AuthenticatedSearchRoute,
+  AuthenticatedTrustAdministrationRoute: AuthenticatedTrustAdministrationRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   StyleGuideRoute: StyleGuideRoute,
 }
 export const routeTree = rootRouteImport
