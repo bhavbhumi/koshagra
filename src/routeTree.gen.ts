@@ -21,6 +21,7 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedInstitutionalPreparednessRouteImport } from './routes/_authenticated/institutional-preparedness'
 import { Route as AuthenticatedInstitutionalMemoryRouteImport } from './routes/_authenticated/institutional-memory'
 import { Route as AuthenticatedInstitutionalCoordinationRouteImport } from './routes/_authenticated/institutional-coordination'
+import { Route as AuthenticatedInstitutionRegistryRouteImport } from './routes/_authenticated/institution-registry'
 import { Route as AuthenticatedFamilyGovernanceRouteImport } from './routes/_authenticated/family-governance'
 import { Route as AuthenticatedEstatePlanningRouteImport } from './routes/_authenticated/estate-planning'
 import { Route as AuthenticatedDigitalLegacyRouteImport } from './routes/_authenticated/digital-legacy'
@@ -93,6 +94,12 @@ const AuthenticatedInstitutionalCoordinationRoute =
     path: '/institutional-coordination',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInstitutionRegistryRoute =
+  AuthenticatedInstitutionRegistryRouteImport.update({
+    id: '/institution-registry',
+    path: '/institution-registry',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFamilyGovernanceRoute =
   AuthenticatedFamilyGovernanceRouteImport.update({
     id: '/family-governance',
@@ -139,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/digital-legacy': typeof AuthenticatedDigitalLegacyRoute
   '/estate-planning': typeof AuthenticatedEstatePlanningRoute
   '/family-governance': typeof AuthenticatedFamilyGovernanceRoute
+  '/institution-registry': typeof AuthenticatedInstitutionRegistryRoute
   '/institutional-coordination': typeof AuthenticatedInstitutionalCoordinationRoute
   '/institutional-memory': typeof AuthenticatedInstitutionalMemoryRoute
   '/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
@@ -158,6 +166,7 @@ export interface FileRoutesByTo {
   '/digital-legacy': typeof AuthenticatedDigitalLegacyRoute
   '/estate-planning': typeof AuthenticatedEstatePlanningRoute
   '/family-governance': typeof AuthenticatedFamilyGovernanceRoute
+  '/institution-registry': typeof AuthenticatedInstitutionRegistryRoute
   '/institutional-coordination': typeof AuthenticatedInstitutionalCoordinationRoute
   '/institutional-memory': typeof AuthenticatedInstitutionalMemoryRoute
   '/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
@@ -179,6 +188,7 @@ export interface FileRoutesById {
   '/_authenticated/digital-legacy': typeof AuthenticatedDigitalLegacyRoute
   '/_authenticated/estate-planning': typeof AuthenticatedEstatePlanningRoute
   '/_authenticated/family-governance': typeof AuthenticatedFamilyGovernanceRoute
+  '/_authenticated/institution-registry': typeof AuthenticatedInstitutionRegistryRoute
   '/_authenticated/institutional-coordination': typeof AuthenticatedInstitutionalCoordinationRoute
   '/_authenticated/institutional-memory': typeof AuthenticatedInstitutionalMemoryRoute
   '/_authenticated/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/digital-legacy'
     | '/estate-planning'
     | '/family-governance'
+    | '/institution-registry'
     | '/institutional-coordination'
     | '/institutional-memory'
     | '/institutional-preparedness'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/digital-legacy'
     | '/estate-planning'
     | '/family-governance'
+    | '/institution-registry'
     | '/institutional-coordination'
     | '/institutional-memory'
     | '/institutional-preparedness'
@@ -239,6 +251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/digital-legacy'
     | '/_authenticated/estate-planning'
     | '/_authenticated/family-governance'
+    | '/_authenticated/institution-registry'
     | '/_authenticated/institutional-coordination'
     | '/_authenticated/institutional-memory'
     | '/_authenticated/institutional-preparedness'
@@ -342,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstitutionalCoordinationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/institution-registry': {
+      id: '/_authenticated/institution-registry'
+      path: '/institution-registry'
+      fullPath: '/institution-registry'
+      preLoaderRoute: typeof AuthenticatedInstitutionRegistryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/family-governance': {
       id: '/_authenticated/family-governance'
       path: '/family-governance'
@@ -394,6 +414,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDigitalLegacyRoute: typeof AuthenticatedDigitalLegacyRoute
   AuthenticatedEstatePlanningRoute: typeof AuthenticatedEstatePlanningRoute
   AuthenticatedFamilyGovernanceRoute: typeof AuthenticatedFamilyGovernanceRoute
+  AuthenticatedInstitutionRegistryRoute: typeof AuthenticatedInstitutionRegistryRoute
   AuthenticatedInstitutionalCoordinationRoute: typeof AuthenticatedInstitutionalCoordinationRoute
   AuthenticatedInstitutionalMemoryRoute: typeof AuthenticatedInstitutionalMemoryRoute
   AuthenticatedInstitutionalPreparednessRoute: typeof AuthenticatedInstitutionalPreparednessRoute
@@ -410,6 +431,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDigitalLegacyRoute: AuthenticatedDigitalLegacyRoute,
   AuthenticatedEstatePlanningRoute: AuthenticatedEstatePlanningRoute,
   AuthenticatedFamilyGovernanceRoute: AuthenticatedFamilyGovernanceRoute,
+  AuthenticatedInstitutionRegistryRoute: AuthenticatedInstitutionRegistryRoute,
   AuthenticatedInstitutionalCoordinationRoute:
     AuthenticatedInstitutionalCoordinationRoute,
   AuthenticatedInstitutionalMemoryRoute: AuthenticatedInstitutionalMemoryRoute,
