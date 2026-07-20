@@ -56,11 +56,12 @@ export async function findParticipantByEmail(email: string) {
 }
 
 export async function decideAccessGrant(grantId: string, decision: "Granted" | "Denied", reason?: string | null) {
-  return supabase.rpc("decide_access_grant", {
+  const args: { _grant_id: string; _decision: string; _reason?: string } = {
     _grant_id: grantId,
     _decision: decision,
-    _reason: reason ?? null,
-  });
+  };
+  if (reason && reason.trim() !== "") args._reason = reason.trim();
+  return supabase.rpc("decide_access_grant", args);
 }
 
 export async function requestActivation(documentId: string, makerParticipantId: string) {
