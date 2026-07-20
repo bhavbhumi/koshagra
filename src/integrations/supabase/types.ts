@@ -322,6 +322,169 @@ export type Database = {
           },
         ]
       }
+      dedications: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_participant_id: string
+          philanthropic_purpose: string
+          related_trust_id: string | null
+          updated_at: string
+          vehicle: Database["public"]["Enums"]["dedication_vehicle"] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_participant_id: string
+          philanthropic_purpose: string
+          related_trust_id?: string | null
+          updated_at?: string
+          vehicle?: Database["public"]["Enums"]["dedication_vehicle"] | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_participant_id?: string
+          philanthropic_purpose?: string
+          related_trust_id?: string | null
+          updated_at?: string
+          vehicle?: Database["public"]["Enums"]["dedication_vehicle"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedications_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dedications_related_trust_id_fkey"
+            columns: ["related_trust_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      distributions: {
+        Row: {
+          alignment_note: string | null
+          amount: number | null
+          created_at: string
+          dedication_id: string
+          distributed_date: string | null
+          grantee_id: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          alignment_note?: string | null
+          amount?: number | null
+          created_at?: string
+          dedication_id: string
+          distributed_date?: string | null
+          grantee_id: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          alignment_note?: string | null
+          amount?: number | null
+          created_at?: string
+          dedication_id?: string
+          distributed_date?: string | null
+          grantee_id?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distributions_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distributions_grantee_id_fkey"
+            columns: ["grantee_id"]
+            isOneToOne: false
+            referencedRelation: "grantees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donors: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          full_name: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          full_name: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donors_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enforcers: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          full_name: string
+          id: string
+          notes: string | null
+          scope_note: string | null
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          scope_note?: string | null
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          scope_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enforcers_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enterprise_documents: {
         Row: {
           body: string
@@ -541,6 +704,76 @@ export type Database = {
           },
         ]
       }
+      grantees: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          id: string
+          name: string
+          notes: string | null
+          purpose_alignment_note: string | null
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          id?: string
+          name: string
+          notes?: string | null
+          purpose_alignment_note?: string | null
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          purpose_alignment_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grantees_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      impact_records: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          description: string
+          id: string
+          notes: string | null
+          recorded_date: string | null
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          description: string
+          id?: string
+          notes?: string | null
+          recorded_date?: string | null
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          description?: string
+          id?: string
+          notes?: string | null
+          recorded_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "impact_records_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       key_persons: {
         Row: {
           created_at: string
@@ -729,6 +962,41 @@ export type Database = {
         }
         Relationships: []
       }
+      philanthropic_stewards: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          full_name: string
+          id: string
+          notes: string | null
+          source_of_authority_note: string | null
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          source_of_authority_note?: string | null
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          source_of_authority_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "philanthropic_stewards_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_advisors: {
         Row: {
           contact_note: string | null
@@ -804,6 +1072,85 @@ export type Database = {
             columns: ["trust_id"]
             isOneToOne: false
             referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purpose_fidelity_concerns: {
+        Row: {
+          concern_type: Database["public"]["Enums"]["concern_type"]
+          created_at: string
+          dedication_id: string
+          description: string
+          escalated_to_enforcer: boolean
+          id: string
+          raised_at: string
+          resolution_note: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["concern_status"]
+        }
+        Insert: {
+          concern_type: Database["public"]["Enums"]["concern_type"]
+          created_at?: string
+          dedication_id: string
+          description: string
+          escalated_to_enforcer?: boolean
+          id?: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["concern_status"]
+        }
+        Update: {
+          concern_type?: Database["public"]["Enums"]["concern_type"]
+          created_at?: string
+          dedication_id?: string
+          description?: string
+          escalated_to_enforcer?: boolean
+          id?: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["concern_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purpose_fidelity_concerns_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purpose_fidelity_reviews: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          id: string
+          note: string | null
+          reviewed_at: string
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          id?: string
+          note?: string | null
+          reviewed_at?: string
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          id?: string
+          note?: string | null
+          reviewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purpose_fidelity_reviews_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
             referencedColumns: ["id"]
           },
         ]
@@ -1059,6 +1406,10 @@ export type Database = {
         }[]
       }
       is_eligible_checker: { Args: { _grant_id: string }; Returns: boolean }
+      participant_owns_dedication: {
+        Args: { _dedication_id: string }
+        Returns: boolean
+      }
       participant_owns_enterprise: {
         Args: { _enterprise_id: string }
         Returns: boolean
@@ -1076,7 +1427,14 @@ export type Database = {
     Enums: {
       asset_type: "Asset" | "Digital Asset"
       beneficiary_type: "Named" | "Class"
+      concern_status: "Active" | "Resolved"
+      concern_type: "Drift" | "Capture" | "Other"
       cross_domain_flag_status: "Active" | "Resolved"
+      dedication_vehicle:
+        | "Foundation"
+        | "Charitable Trust"
+        | "Donor-Advised Fund"
+        | "Informal"
       enterprise_document_status: "Draft" | "Active" | "Superseded"
       enterprise_document_type: "Enterprise Constitution" | "Buy-Sell Agreement"
       enterprise_principal_role: "Founder" | "Principal"
@@ -1232,7 +1590,15 @@ export const Constants = {
     Enums: {
       asset_type: ["Asset", "Digital Asset"],
       beneficiary_type: ["Named", "Class"],
+      concern_status: ["Active", "Resolved"],
+      concern_type: ["Drift", "Capture", "Other"],
       cross_domain_flag_status: ["Active", "Resolved"],
+      dedication_vehicle: [
+        "Foundation",
+        "Charitable Trust",
+        "Donor-Advised Fund",
+        "Informal",
+      ],
       enterprise_document_status: ["Draft", "Active", "Superseded"],
       enterprise_document_type: [
         "Enterprise Constitution",
