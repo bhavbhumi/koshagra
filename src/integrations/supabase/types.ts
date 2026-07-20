@@ -322,6 +322,38 @@ export type Database = {
           },
         ]
       }
+      currency_reviews: {
+        Row: {
+          finding: Database["public"]["Enums"]["currency_review_finding"]
+          id: string
+          note: string | null
+          preparedness_record_id: string
+          reviewed_at: string
+        }
+        Insert: {
+          finding: Database["public"]["Enums"]["currency_review_finding"]
+          id?: string
+          note?: string | null
+          preparedness_record_id: string
+          reviewed_at?: string
+        }
+        Update: {
+          finding?: Database["public"]["Enums"]["currency_review_finding"]
+          id?: string
+          note?: string | null
+          preparedness_record_id?: string
+          reviewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "currency_reviews_preparedness_record_id_fkey"
+            columns: ["preparedness_record_id"]
+            isOneToOne: false
+            referencedRelation: "preparedness_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dedications: {
         Row: {
           created_at: string
@@ -1275,6 +1307,176 @@ export type Database = {
           },
         ]
       }
+      preparedness_concerns: {
+        Row: {
+          concern_type: Database["public"]["Enums"]["preparedness_concern_type"]
+          description: string
+          id: string
+          preparedness_record_id: string
+          raised_at: string
+          resolution_note: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["preparedness_concern_status"]
+        }
+        Insert: {
+          concern_type: Database["public"]["Enums"]["preparedness_concern_type"]
+          description: string
+          id?: string
+          preparedness_record_id: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["preparedness_concern_status"]
+        }
+        Update: {
+          concern_type?: Database["public"]["Enums"]["preparedness_concern_type"]
+          description?: string
+          id?: string
+          preparedness_record_id?: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["preparedness_concern_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preparedness_concerns_preparedness_record_id_fkey"
+            columns: ["preparedness_record_id"]
+            isOneToOne: false
+            referencedRelation: "preparedness_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preparedness_gap_flags: {
+        Row: {
+          description: string
+          id: string
+          preparedness_record_id: string
+          raised_at: string
+          resolution_note: string | null
+          resolved_at: string | null
+          scope: Database["public"]["Enums"]["gap_scope"]
+          status: Database["public"]["Enums"]["gap_status"]
+        }
+        Insert: {
+          description: string
+          id?: string
+          preparedness_record_id: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          scope: Database["public"]["Enums"]["gap_scope"]
+          status?: Database["public"]["Enums"]["gap_status"]
+        }
+        Update: {
+          description?: string
+          id?: string
+          preparedness_record_id?: string
+          raised_at?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          scope?: Database["public"]["Enums"]["gap_scope"]
+          status?: Database["public"]["Enums"]["gap_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preparedness_gap_flags_preparedness_record_id_fkey"
+            columns: ["preparedness_record_id"]
+            isOneToOne: false
+            referencedRelation: "preparedness_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preparedness_records: {
+        Row: {
+          affected_domain: Database["public"]["Enums"]["preparedness_affected_domain"]
+          category_description: string | null
+          category_name: string
+          confidence_classification:
+            | Database["public"]["Enums"]["preparedness_confidence"]
+            | null
+          contingency_reference_note: string | null
+          created_at: string
+          id: string
+          owner_participant_id: string
+          updated_at: string
+        }
+        Insert: {
+          affected_domain: Database["public"]["Enums"]["preparedness_affected_domain"]
+          category_description?: string | null
+          category_name: string
+          confidence_classification?:
+            | Database["public"]["Enums"]["preparedness_confidence"]
+            | null
+          contingency_reference_note?: string | null
+          created_at?: string
+          id?: string
+          owner_participant_id: string
+          updated_at?: string
+        }
+        Update: {
+          affected_domain?: Database["public"]["Enums"]["preparedness_affected_domain"]
+          category_description?: string | null
+          category_name?: string
+          confidence_classification?:
+            | Database["public"]["Enums"]["preparedness_confidence"]
+            | null
+          contingency_reference_note?: string | null
+          created_at?: string
+          id?: string
+          owner_participant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preparedness_records_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preparedness_stewards: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          owner_participant_id: string
+          source_of_authority_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          owner_participant_id: string
+          source_of_authority_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          owner_participant_id?: string
+          source_of_authority_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preparedness_stewards_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_advisors: {
         Row: {
           contact_note: string | null
@@ -1804,6 +2006,10 @@ export type Database = {
         Args: { _record_id: string }
         Returns: boolean
       }
+      participant_owns_preparedness_record: {
+        Args: { _record_id: string }
+        Returns: boolean
+      }
       participant_owns_representation: {
         Args: { _representation_id: string }
         Returns: boolean
@@ -1816,6 +2022,7 @@ export type Database = {
       concern_status: "Active" | "Resolved"
       concern_type: "Drift" | "Capture" | "Other"
       cross_domain_flag_status: "Active" | "Resolved"
+      currency_review_finding: "Still Adequate" | "No Longer Adequate"
       dedication_vehicle:
         | "Foundation"
         | "Charitable Trust"
@@ -1825,6 +2032,8 @@ export type Database = {
       enterprise_document_type: "Enterprise Constitution" | "Buy-Sell Agreement"
       enterprise_principal_role: "Founder" | "Principal"
       family_member_status: "Active" | "Suspended"
+      gap_scope: "Full" | "Partial"
+      gap_status: "Active" | "Resolved"
       governance_body: "Council" | "Assembly"
       governance_document_status: "Draft" | "Active" | "Superseded"
       governance_document_type:
@@ -1854,6 +2063,26 @@ export type Database = {
         | "Institution"
         | "Professional"
         | "AI Agent"
+      preparedness_affected_domain:
+        | "Estate Planning"
+        | "Family Governance"
+        | "Business Succession"
+        | "Trust Administration"
+        | "Philanthropy"
+        | "Digital Legacy"
+        | "Institutional Memory"
+        | "Cross-Domain / Other"
+      preparedness_concern_status: "Active" | "Resolved"
+      preparedness_concern_type:
+        | "Preparedness Theater"
+        | "Manufactured Urgency"
+        | "Other"
+      preparedness_confidence:
+        | "Verified Preparedness"
+        | "Partially Verified Preparedness"
+        | "Reported Preparedness"
+        | "Inferred Preparedness"
+        | "Unknown Preparedness"
       representation_concern_status: "Active" | "Resolved"
       representation_concern_type:
         | "Compromise"
@@ -2007,6 +2236,7 @@ export const Constants = {
       concern_status: ["Active", "Resolved"],
       concern_type: ["Drift", "Capture", "Other"],
       cross_domain_flag_status: ["Active", "Resolved"],
+      currency_review_finding: ["Still Adequate", "No Longer Adequate"],
       dedication_vehicle: [
         "Foundation",
         "Charitable Trust",
@@ -2020,6 +2250,8 @@ export const Constants = {
       ],
       enterprise_principal_role: ["Founder", "Principal"],
       family_member_status: ["Active", "Suspended"],
+      gap_scope: ["Full", "Partial"],
+      gap_status: ["Active", "Resolved"],
       governance_body: ["Council", "Assembly"],
       governance_document_status: ["Draft", "Active", "Superseded"],
       governance_document_type: [
@@ -2052,6 +2284,29 @@ export const Constants = {
         "Institution",
         "Professional",
         "AI Agent",
+      ],
+      preparedness_affected_domain: [
+        "Estate Planning",
+        "Family Governance",
+        "Business Succession",
+        "Trust Administration",
+        "Philanthropy",
+        "Digital Legacy",
+        "Institutional Memory",
+        "Cross-Domain / Other",
+      ],
+      preparedness_concern_status: ["Active", "Resolved"],
+      preparedness_concern_type: [
+        "Preparedness Theater",
+        "Manufactured Urgency",
+        "Other",
+      ],
+      preparedness_confidence: [
+        "Verified Preparedness",
+        "Partially Verified Preparedness",
+        "Reported Preparedness",
+        "Inferred Preparedness",
+        "Unknown Preparedness",
       ],
       representation_concern_status: ["Active", "Resolved"],
       representation_concern_type: [
