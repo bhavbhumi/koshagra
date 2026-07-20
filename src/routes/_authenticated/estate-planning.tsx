@@ -136,12 +136,33 @@ function OverviewTab({ estate }: { estate: Estate }) {
     { Executor: 0, Guardian: 0, Beneficiary: 0 },
   );
 
+  const lastUpdatedIso = useMemo(() => {
+    const candidates: (string | null | undefined)[] = [
+      estate.updated_at, estate.created_at,
+      will?.updated_at, will?.created_at, will?.executed_at,
+      ...assets.flatMap((a) => [a.updated_at, a.created_at]),
+      ...liabilities.flatMap((l) => [l.updated_at, l.created_at]),
+      ...nominations.flatMap((n) => [n.updated_at, n.created_at]),
+    ];
+    const times = candidates
+      .filter((v): v is string => !!v)
+      .map((v) => new Date(v).getTime())
+      .filter((n) => Number.isFinite(n));
+    if (times.length === 0) return null;
+    return new Date(Math.max(...times)).toISOString();
+  }, [estate, will, assets, liabilities, nominations]);
+
   return (
     <div className="space-y-xl">
       <header>
         <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">{estate.name}</h2>
         {estate.purpose_description && (
           <p className="mt-xs max-w-[48rem] text-sm text-slate-grey">{estate.purpose_description}</p>
+        )}
+        {lastUpdatedIso && (
+          <p className="mt-xs text-xs text-slate-grey">
+            Last updated <span className="font-numeral">{formatEnInDate(lastUpdatedIso)}</span>
+          </p>
         )}
       </header>
 
@@ -151,7 +172,11 @@ function OverviewTab({ estate }: { estate: Estate }) {
         <StatCard label="Will" value={will?.status ?? "—"} numeric={false} />
         <StatCard label="Assets" value={assets.length} />
         <StatCard label="Liabilities" value={liabilities.length} />
-        <StatCard label="Executors" value={roleCounts.Executor} />
+        <StatCard
+          label="Executors"
+          value={roleCounts.Executor}
+          note={roleCounts.Executor === 0 ? { text: "No Executor nominated yet", to: "nominations" } : null}
+        />
         <StatCard label="Guardians" value={roleCounts.Guardian} />
         <StatCard label="Beneficiaries" value={roleCounts.Beneficiary} />
       </div>
@@ -195,13 +220,28 @@ function LifecycleStrip({ current }: { current: LifecycleStage }) {
   );
 }
 
-function StatCard({ label, value, numeric = true }: { label: string; value: number | string; numeric?: boolean }) {
+function StatCard({ label, value, numeric = true, note = null }: {
+  label: string; value: number | string; numeric?: boolean;
+  note?: { text: string; to: TabKey } | null;
+}) {
   return (
     <div className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="text-xs uppercase tracking-widest text-slate-grey">{label}</div>
       <div className={"mt-xs text-kosha-navy " + (numeric ? "font-numeral text-[28px] leading-[36px]" : "font-display text-[20px] leading-[28px]")}>
         {value}
       </div>
+      {note && (
+        <a
+          href={`#${note.to}`}
+          onClick={(e) => {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent("koshagra:estate-tab", { detail: note.to }));
+          }}
+          className="mt-xs block text-xs text-slate-grey underline underline-offset-2 hover:text-kosha-navy"
+        >
+          {note.text}
+        </a>
+      )}
     </div>
   );
 }
