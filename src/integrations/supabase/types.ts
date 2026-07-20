@@ -93,6 +93,133 @@ export type Database = {
           },
         ]
       }
+      family_members: {
+        Row: {
+          branch: string | null
+          created_at: string
+          family_id: string
+          full_name: string
+          id: string
+          status: Database["public"]["Enums"]["family_member_status"]
+          updated_at: string
+        }
+        Insert: {
+          branch?: string | null
+          created_at?: string
+          family_id: string
+          full_name: string
+          id?: string
+          status?: Database["public"]["Enums"]["family_member_status"]
+          updated_at?: string
+        }
+        Update: {
+          branch?: string | null
+          created_at?: string
+          family_id?: string
+          full_name?: string
+          id?: string
+          status?: Database["public"]["Enums"]["family_member_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_body_members: {
+        Row: {
+          body: Database["public"]["Enums"]["governance_body"]
+          created_at: string
+          family_id: string
+          family_member_id: string
+          id: string
+          seat_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          body: Database["public"]["Enums"]["governance_body"]
+          created_at?: string
+          family_id: string
+          family_member_id: string
+          id?: string
+          seat_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: Database["public"]["Enums"]["governance_body"]
+          created_at?: string
+          family_id?: string
+          family_member_id?: string
+          id?: string
+          seat_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_body_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_body_members_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_documents: {
+        Row: {
+          body: string
+          created_at: string
+          document_type: Database["public"]["Enums"]["governance_document_type"]
+          family_id: string
+          id: string
+          status: Database["public"]["Enums"]["governance_document_status"]
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          document_type: Database["public"]["Enums"]["governance_document_type"]
+          family_id: string
+          id?: string
+          status?: Database["public"]["Enums"]["governance_document_status"]
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          document_type?: Database["public"]["Enums"]["governance_document_type"]
+          family_id?: string
+          id?: string
+          status?: Database["public"]["Enums"]["governance_document_status"]
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_documents_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       liabilities: {
         Row: {
           amount: number | null
@@ -249,9 +376,20 @@ export type Database = {
         Args: { _estate_id: string }
         Returns: boolean
       }
+      participant_owns_family: {
+        Args: { _family_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       asset_type: "Asset" | "Digital Asset"
+      family_member_status: "Active" | "Suspended"
+      governance_body: "Council" | "Assembly"
+      governance_document_status: "Draft" | "Active" | "Superseded"
+      governance_document_type:
+        | "Constitution"
+        | "Family Policy"
+        | "Code of Conduct"
       nomination_role: "Executor" | "Guardian" | "Beneficiary"
       participant_type:
         | "Individual"
@@ -394,6 +532,14 @@ export const Constants = {
   public: {
     Enums: {
       asset_type: ["Asset", "Digital Asset"],
+      family_member_status: ["Active", "Suspended"],
+      governance_body: ["Council", "Assembly"],
+      governance_document_status: ["Draft", "Active", "Superseded"],
+      governance_document_type: [
+        "Constitution",
+        "Family Policy",
+        "Code of Conduct",
+      ],
       nomination_role: ["Executor", "Guardian", "Beneficiary"],
       participant_type: [
         "Individual",
