@@ -76,7 +76,7 @@ function AuthPage() {
         </Link>
       </header>
       <main className="flex-1 flex items-center justify-center px-xl py-2xl">
-        <div className="w-full max-w-md rounded-md bg-pure-white p-2xl shadow-[var(--shadow-2)] ring-1 ring-[color:var(--color-border-default)]">
+        <div className="w-full max-w-[28rem] rounded-md bg-pure-white p-2xl shadow-[var(--shadow-2)] ring-1 ring-[color:var(--color-border-default)]">
           <h1 className="text-[28px] leading-[36px] text-kosha-navy">
             {mode === "signup" ? "Create your workspace" : mode === "forgot" ? "Reset your password" : "Welcome back"}
           </h1>

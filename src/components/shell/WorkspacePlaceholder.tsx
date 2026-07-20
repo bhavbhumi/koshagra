@@ -4,7 +4,7 @@
  */
 export function WorkspacePlaceholder() {
   return (
-    <section className="max-w-2xl">
+    <section className="max-w-[42rem]">
       <p className="text-sm text-slate-grey">
         Content for this workspace arrives in a later sprint.
       </p>

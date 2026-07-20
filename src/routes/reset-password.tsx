@@ -37,7 +37,7 @@ function ResetPasswordPage() {
 
   return (
     <div className="min-h-dvh bg-vault-ivory flex items-center justify-center px-xl">
-      <form onSubmit={handleSubmit} className="w-full max-w-md rounded-md bg-pure-white p-2xl shadow-[var(--shadow-2)] ring-1 ring-[color:var(--color-border-default)] flex flex-col gap-md">
+      <form onSubmit={handleSubmit} className="w-full max-w-[28rem] rounded-md bg-pure-white p-2xl shadow-[var(--shadow-2)] ring-1 ring-[color:var(--color-border-default)] flex flex-col gap-md">
         <h1 className="text-[28px] leading-[36px] text-kosha-navy">Set a new password</h1>
         <label className="flex flex-col gap-xs">
           <span className="text-xs uppercase tracking-widest text-slate-grey">New password</span>

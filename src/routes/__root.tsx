@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 function NotFoundComponent() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-vault-ivory px-4">
-      <div className="max-w-md text-center">
+      <div className="max-w-[28rem] text-center">
         <h1 className="numeral text-7xl text-kosha-navy">404</h1>
         <h2 className="mt-4 text-xl text-kosha-navy">Page not found</h2>
         <p className="mt-2 text-sm text-slate-grey">
@@ -44,7 +44,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-vault-ivory px-4">
-      <div className="max-w-md text-center">
+      <div className="max-w-[28rem] text-center">
         <h1 className="text-xl text-kosha-navy">
           This page didn't load
         </h1>
@@ -97,6 +97,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", type: "image/svg+xml", href: "/brand/app-icon.svg" },
+      { rel: "apple-touch-icon", href: "/brand/app-icon.svg" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

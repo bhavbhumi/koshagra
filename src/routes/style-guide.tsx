@@ -109,7 +109,7 @@ function Swatch({ hex, name, note, dark }: { hex: string; name: string; note?: s
 
 function StyleGuide() {
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-[72rem]">
       <header>
         <p className="text-xs uppercase tracking-widest text-slate-grey">Internal reference</p>
         <h1 className="mt-md text-[40px] leading-[48px]">Style Guide</h1>

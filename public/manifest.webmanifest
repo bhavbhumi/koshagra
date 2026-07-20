@@ -1,0 +1,15 @@
+{
+  "name": "Koshagra — Institutional Continuity Platform",
+  "short_name": "Koshagra",
+  "description": "Institutional operating system for multi-generational continuity.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F5F0",
+  "theme_color": "#0A1628",
+  "icons": [
+    { "src": "/brand/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/brand/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
