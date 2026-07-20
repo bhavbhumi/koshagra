@@ -195,6 +195,38 @@ export type Database = {
           },
         ]
       }
+      coherence_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          owner_participant_id: string
+          reviewed_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          owner_participant_id: string
+          reviewed_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          owner_participant_id?: string
+          reviewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coherence_reviews_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       continuity_subjects: {
         Row: {
           created_at: string
@@ -229,6 +261,63 @@ export type Database = {
             columns: ["owner_participant_id"]
             isOneToOne: false
             referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cross_domain_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          owner_participant_id: string
+          raised_at: string
+          related_subject_id: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["cross_domain_flag_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_participant_id: string
+          raised_at?: string
+          related_subject_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["cross_domain_flag_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_participant_id?: string
+          raised_at?: string
+          related_subject_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["cross_domain_flag_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_domain_flags_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_domain_flags_related_subject_id_fkey"
+            columns: ["related_subject_id"]
+            isOneToOne: false
+            referencedRelation: "continuity_subjects"
             referencedColumns: ["id"]
           },
         ]
@@ -640,6 +729,47 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_advisors: {
+        Row: {
+          contact_note: string | null
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          owner_participant_id: string
+          specialty: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_note?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          owner_participant_id: string
+          specialty?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_note?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          owner_participant_id?: string
+          specialty?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_advisors_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       protectors: {
         Row: {
           created_at: string
@@ -946,6 +1076,7 @@ export type Database = {
     Enums: {
       asset_type: "Asset" | "Digital Asset"
       beneficiary_type: "Named" | "Class"
+      cross_domain_flag_status: "Active" | "Resolved"
       enterprise_document_status: "Draft" | "Active" | "Superseded"
       enterprise_document_type: "Enterprise Constitution" | "Buy-Sell Agreement"
       enterprise_principal_role: "Founder" | "Principal"
@@ -1101,6 +1232,7 @@ export const Constants = {
     Enums: {
       asset_type: ["Asset", "Digital Asset"],
       beneficiary_type: ["Named", "Class"],
+      cross_domain_flag_status: ["Active", "Resolved"],
       enterprise_document_status: ["Draft", "Active", "Superseded"],
       enterprise_document_type: [
         "Enterprise Constitution",
