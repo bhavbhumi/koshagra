@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTrustAdministrationRouteImport } from './routes/_authenticated/trust-administration'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
+import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedPhilanthropyRouteImport } from './routes/_authenticated/philanthropy'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedInstitutionalPreparednessRouteImport } from './routes/_authenticated/institutional-preparedness'
@@ -62,6 +63,11 @@ const AuthenticatedTrustAdministrationRoute =
 const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReviewRoute = AuthenticatedReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPhilanthropyRoute =
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/philanthropy': typeof AuthenticatedPhilanthropyRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/search': typeof AuthenticatedSearchRoute
   '/trust-administration': typeof AuthenticatedTrustAdministrationRoute
 }
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/philanthropy': typeof AuthenticatedPhilanthropyRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/search': typeof AuthenticatedSearchRoute
   '/trust-administration': typeof AuthenticatedTrustAdministrationRoute
 }
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/institutional-preparedness': typeof AuthenticatedInstitutionalPreparednessRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/philanthropy': typeof AuthenticatedPhilanthropyRoute
+  '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/trust-administration': typeof AuthenticatedTrustAdministrationRoute
 }
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/institutional-preparedness'
     | '/notifications'
     | '/philanthropy'
+    | '/review'
     | '/search'
     | '/trust-administration'
   fileRoutesByTo: FileRoutesByTo
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/institutional-preparedness'
     | '/notifications'
     | '/philanthropy'
+    | '/review'
     | '/search'
     | '/trust-administration'
   id:
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/_authenticated/institutional-preparedness'
     | '/_authenticated/notifications'
     | '/_authenticated/philanthropy'
+    | '/_authenticated/review'
     | '/_authenticated/search'
     | '/_authenticated/trust-administration'
   fileRoutesById: FileRoutesById
@@ -318,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof AuthenticatedSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/review': {
+      id: '/_authenticated/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof AuthenticatedReviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/philanthropy': {
@@ -420,6 +439,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInstitutionalPreparednessRoute: typeof AuthenticatedInstitutionalPreparednessRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPhilanthropyRoute: typeof AuthenticatedPhilanthropyRoute
+  AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
   AuthenticatedTrustAdministrationRoute: typeof AuthenticatedTrustAdministrationRoute
 }
@@ -439,6 +459,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedInstitutionalPreparednessRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPhilanthropyRoute: AuthenticatedPhilanthropyRoute,
+  AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedSearchRoute: AuthenticatedSearchRoute,
   AuthenticatedTrustAdministrationRoute: AuthenticatedTrustAdministrationRoute,
 }
