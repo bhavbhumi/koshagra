@@ -817,3 +817,46 @@ function FormActions({ onCancel, busy }: { onCancel: () => void; busy: boolean }
     </div>
   );
 }
+
+/* ================= Timeline ================= */
+
+type TimelineEntry = { at: string; label: string };
+
+function TimelineTab({ estate }: { estate: Estate }) {
+  const { will } = useWill(estate.id);
+  const { items: assets } = useAssets(estate.id);
+  const { items: liabilities } = useLiabilities(estate.id);
+  const { items: nominations } = useNominations(estate.id);
+
+  const entries = useMemo<TimelineEntry[]>(() => {
+    const out: TimelineEntry[] = [];
+    out.push({ at: estate.created_at, label: "Estate created" });
+    if (will?.created_at) out.push({ at: will.created_at, label: "Will started" });
+    if (will?.executed_at) out.push({ at: will.executed_at, label: "Will marked Executed" });
+    for (const a of assets) out.push({ at: a.created_at, label: `Asset added: ${a.name}` });
+    for (const l of liabilities) out.push({ at: l.created_at, label: `Liability added: ${l.name}` });
+    for (const n of nominations) {
+      out.push({ at: n.created_at, label: `Nomination recorded: ${n.nominee_name} as ${n.role}` });
+    }
+    return out.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  }, [estate, will, assets, liabilities, nominations]);
+
+  return (
+    <div className="max-w-[48rem]">
+      <p className="text-sm text-slate-grey">
+        Every recorded event for this Estate, most recent first.
+      </p>
+      <ol className="mt-md space-y-xs">
+        {entries.map((e, i) => (
+          <li
+            key={i}
+            className="flex flex-wrap items-baseline justify-between gap-md rounded-md bg-pure-white px-md py-3 shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]"
+          >
+            <span className="text-sm text-kosha-navy">{e.label}</span>
+            <span className="font-numeral text-xs text-slate-grey">{formatEnInDate(e.at)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
