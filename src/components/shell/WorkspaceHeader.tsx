@@ -29,7 +29,7 @@ export function WorkspaceHeader({ participant }: { participant: ParticipantSumma
   return (
     <>
       {/* Breadcrumb + Workspace Switcher row */}
-      <div className="flex items-center justify-between border-b border-[color:var(--color-border-default)] bg-pure-white px-xl h-12">
+      <div className="flex items-center justify-between border-b border-[color:var(--color-border-default)] bg-pure-white px-md sm:px-xl h-12">
         <nav aria-label="Breadcrumb" className="text-xs text-slate-grey">
           <ol className="flex items-center gap-2">
             <li><Link to="/dashboard" className="hover:text-kosha-navy">Home</Link></li>
@@ -64,7 +64,7 @@ export function WorkspaceHeader({ participant }: { participant: ParticipantSumma
       </div>
 
       {/* Header proper */}
-      <header className="flex items-start justify-between gap-lg border-b border-[color:var(--color-border-default)] bg-pure-white px-xl py-lg">
+      <header className="flex flex-col gap-md border-b border-[color:var(--color-border-default)] bg-pure-white px-md py-lg sm:flex-row sm:items-start sm:justify-between sm:gap-lg sm:px-xl">
         <div className="min-w-0">
           <h1 className="font-display text-[28px] leading-[36px] text-kosha-navy">
             {current?.name ?? "Koshagra"}
@@ -81,9 +81,9 @@ export function WorkspaceHeader({ participant }: { participant: ParticipantSumma
             </span>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-md">
-          <div className="text-right">
-            <div className="text-sm text-kosha-navy">{participant?.display_name ?? "—"}</div>
+        <div className="flex shrink-0 items-center justify-between gap-md sm:justify-end">
+          <div className="min-w-0 sm:text-right">
+            <div className="truncate text-sm text-kosha-navy">{participant?.display_name ?? "—"}</div>
             <div className="text-xs uppercase tracking-widest text-slate-grey">
               Capacity · {capacity}
             </div>
