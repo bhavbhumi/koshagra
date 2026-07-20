@@ -1,24 +1,51 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <section aria-labelledby="foundation-heading" className="max-w-3xl">
+      <p className="text-xs uppercase tracking-widest text-slate-grey">
+        Sprint 0
+      </p>
+      <h1
+        id="foundation-heading"
+        className="mt-md text-[40px] leading-[48px]"
+      >
+        Foundation.
+      </h1>
+      <p className="mt-lg max-w-prose text-base leading-[26px] text-slate-grey">
+        This build establishes the design system, typography, and application
+        shell for Koshagra. Features arrive in later sprints. The token
+        reference is available at{" "}
+        <a
+          href="/style-guide"
+          className="text-kosha-navy underline decoration-bindu-gold decoration-2 underline-offset-4 hover:text-kosha-navy/80"
+        >
+          /style-guide
+        </a>
+        .
+      </p>
+
+      <div className="mt-2xl grid gap-lg sm:grid-cols-3">
+        {[
+          { label: "Palette", value: "5" },
+          { label: "Semantic tokens", value: "11" },
+          { label: "Type scale", value: "6" },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="rounded-md bg-pure-white p-lg shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]"
+          >
+            <div className="numeral text-4xl text-kosha-navy">{item.value}</div>
+            <div className="mt-xs text-xs uppercase tracking-widest text-slate-grey">
+              {item.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
