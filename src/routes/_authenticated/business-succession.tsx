@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import { formatDate } from "@/lib/format";
 import {
   ENTERPRISE_DOCUMENT_TYPES,
@@ -127,7 +126,6 @@ function BusinessSuccessionPage() {
 
   return (
     <section className="max-w-[72rem]">
-      <WorkspaceIntro slug="business" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab enterprise={enterprise} onRefreshEnterprise={refresh} />}

@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SUBJECT_TYPES, countByType, useContinuitySubjects } from "@/lib/continuity-subjects";
 import { useParticipant } from "@/lib/participant";
 import { usePendingReviews } from "@/lib/access-grants";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: DashboardPage });
 
@@ -54,7 +53,6 @@ function DashboardPage() {
 
   return (
     <section className="max-w-[64rem]">
-      <WorkspaceIntro slug="dashboard" />
       <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Continuity Subjects" value={total} />
         {SUBJECT_TYPES.map((t) => (

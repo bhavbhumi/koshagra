@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { formatINR } from "@/lib/estate";
 import { formatDate } from "@/lib/format";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import {
   BENEFICIARY_TYPES,
   TRUSTEE_ROLES,
@@ -127,7 +126,6 @@ function TrustAdministrationPage() {
 
   return (
     <section className="max-w-[72rem]">
-      <WorkspaceIntro slug="trust" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab trust={trust} onRefreshTrust={refresh} />}

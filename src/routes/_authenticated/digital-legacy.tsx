@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { LinkParticipant } from "@/components/access/LinkParticipant";
 import { requestDisposition, useHasPendingRequest } from "@/lib/access-grants";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import { humanizeState, stateTitle } from "@/lib/state-labels";
 
 export const Route = createFileRoute("/_authenticated/digital-legacy")({
@@ -193,7 +192,6 @@ function DigitalLegacyPage() {
 
   return (
     <section className="max-w-[72rem] space-y-xl">
-      <WorkspaceIntro slug="digital" />
       <DigitalExecutorsSection
         participantId={participant.id}
         items={executors.items}

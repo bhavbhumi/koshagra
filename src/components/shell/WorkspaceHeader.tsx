@@ -107,9 +107,17 @@ export function AppHeader({
                     {purposeOpen && (
                       <span
                         role="tooltip"
-                        className="absolute left-1/2 top-full z-[100] mt-2 w-64 -translate-x-1/2 rounded-md bg-kosha-navy px-md py-sm text-xs font-normal normal-case tracking-normal text-vault-ivory shadow-[var(--shadow-2)]"
+                        className="absolute left-1/2 top-full z-[100] mt-2 w-80 -translate-x-1/2 rounded-md bg-kosha-navy px-md py-sm text-left text-xs font-normal normal-case tracking-normal text-vault-ivory shadow-[var(--shadow-2)]"
                       >
-                        {current.purpose}
+                        {current.intro && current.intro.length > 0 ? (
+                          <span className="block space-y-2">
+                            {current.intro.map((p, i) => (
+                              <span key={i} className="block leading-relaxed">{p}</span>
+                            ))}
+                          </span>
+                        ) : (
+                          <span className="block leading-relaxed">{current.purpose}</span>
+                        )}
                       </span>
                     )}
                   </button>
@@ -196,24 +204,10 @@ export function AppHeader({
  * Presently a single "Overview" tab is shown; per-workspace tabs slot in here.
  */
 export function WorkspaceTabs() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const current = findWorkspaceByPath(pathname);
-  if (!current) return null;
-  return (
-    <div
-      role="tablist"
-      aria-label="Workspace sections"
-      className="sticky top-14 z-30 flex gap-lg border-b border-[color:var(--color-border-default)] bg-pure-white px-md sm:px-xl"
-    >
-      <span
-        role="tab"
-        aria-selected="true"
-        className="border-b-2 border-bindu-gold py-sm text-xs font-semibold uppercase tracking-widest text-kosha-navy"
-      >
-        Overview
-      </span>
-    </div>
-  );
+  // The shared "Overview" strip has been retired. Each workspace now renders
+  // its own tab strip as the first element under the fixed header. Kept as a
+  // no-op export so external imports do not break.
+  return null;
 }
 
 // Back-compat alias — nothing imports this any more but keeps external refs safe.
