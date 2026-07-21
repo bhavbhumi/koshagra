@@ -4,12 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import {
   decideAccessGrant,
-  subjectTypeLabel,
-  transitionLabel,
   useMyRequests,
   usePendingReviews,
   type AccessGrant,
 } from "@/lib/access-grants";
+import {
+  Term,
+  plainSubjectType,
+  plainTransition,
+  formalHintFor,
+} from "@/components/glossary/Glossary";
 
 export const Route = createFileRoute("/_authenticated/review")({ component: ReviewPage });
 
@@ -64,9 +68,9 @@ function ReviewPage() {
   return (
     <section className="max-w-[72rem] space-y-2xl">
       <div>
-        <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">Awaiting your decision</h2>
+        <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">Waiting for your decision</h2>
         <p className="mt-xs text-sm text-slate-grey">
-          Access Grants where a seat or Steward linked to you is eligible to act as Checker.
+          Someone in your family or circle asked to change something, and you're the person who can approve or decline it. Nothing changes until you decide.
         </p>
         <div className="mt-md space-y-md">
           {pending.length === 0 && (
@@ -84,16 +88,16 @@ function ReviewPage() {
       </div>
 
       <div>
-        <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">Your requests</h2>
+        <h2 className="font-display text-[28px] leading-[36px] text-kosha-navy">Requests you sent</h2>
         <p className="mt-xs text-sm text-slate-grey">
-          Access Grants you originated, and where each one now stands.
+          Changes you've asked for, and where each one stands. You can't approve your own request — a second person has to.
         </p>
         <div className="mt-md space-y-md">
           {mine.length === 0 && (
             <p className="text-sm text-slate-grey">
-              You haven't requested any transitions yet. Governance documents, Representations,
-              Institutional Memory Records, Preparedness Records, and Dedications can all be sent
-              through this Maker-Checker path from their own workspaces.
+              You haven't asked for any changes yet. From any workspace — Family Governance,
+              Digital Legacy, Institutional Memory, Preparedness, or Philanthropy — you can propose
+              a change and send it here for a second person to approve.
             </p>
           )}
           {mine.map((g) => (
@@ -124,7 +128,9 @@ function SubjectLine({ grant }: { grant: AccessGrant }) {
   return (
     <div>
       <div className="text-xs uppercase tracking-widest text-slate-grey">
-        {subjectTypeLabel(grant.subject_entity_type)}
+        <Term termKey={grant.subject_entity_type as never}>
+          {plainSubjectType(grant.subject_entity_type)}
+        </Term>
       </div>
       <div className="mt-xs font-display text-[20px] leading-[28px] text-kosha-navy">
         {grant.subject_label ?? "—"}
@@ -159,13 +165,11 @@ function PendingCard({
       <div className="flex flex-wrap items-start justify-between gap-md">
         <SubjectLine grant={grant} />
         <div className="text-right text-xs text-slate-grey">
-          <div>Requested by</div>
+          <div>Asked by</div>
           <div className="mt-xs text-sm text-kosha-navy">{makerName}</div>
         </div>
       </div>
-      <p className="mt-sm text-sm text-slate-grey">
-        Requested transition · <span className="text-kosha-navy">{transitionLabel(grant)}</span>
-      </p>
+      <TransitionLine grant={grant} />
 
       {message && <p className="mt-sm text-sm text-slate-grey">{message}</p>}
 
@@ -183,7 +187,7 @@ function PendingCard({
             onClick={() => setMode("deny")}
             className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
           >
-            Deny
+            Decline
           </button>
         </div>
       )}
@@ -221,7 +225,7 @@ function PendingCard({
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               className="mt-xs w-full rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm text-kosha-navy"
-              placeholder="A brief note the Maker will see."
+              placeholder="A short note the person who asked will see."
             />
           </label>
           <div className="mt-md flex flex-wrap gap-sm">
@@ -231,7 +235,7 @@ function PendingCard({
               onClick={() => submit("Denied")}
               className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40"
             >
-              {busy ? "Recording…" : "Confirm denial"}
+              {busy ? "Recording…" : "Confirm decline"}
             </button>
             <button
               type="button"
@@ -254,49 +258,47 @@ function ApprovalExplainer({ grant }: { grant: AccessGrant }) {
   if (type === "governance_document" && t === "Activate") {
     return (
       <p className="text-sm text-kosha-navy">
-        Approving will make this document Active. If another document of the same type is currently
-        Active for this Family, it will be superseded — its history remains intact.
+        Approving makes this the document the family follows from now on. If an earlier version is
+        currently in force, it steps aside — its text stays on file exactly as it was.
       </p>
     );
   }
   if (type === "representation" && t === "Decide Disposition") {
     return (
       <p className="text-sm text-kosha-navy">
-        Approving records the Digital Executor's Disposition decision
-        {grant.requested_outcome ? <> · <span className="text-kosha-navy">{grant.requested_outcome}</span></> : null}.
-        Authorized Scope remains fixed; the underlying account is not touched by Koshagra.
+        Approving records what should happen to this digital account
+        {grant.requested_outcome ? <> — <span className="text-kosha-navy">{grant.requested_outcome}</span></> : null}.
+        Koshagra doesn't touch the account itself; it records the decision so the right person can act on it.
       </p>
     );
   }
   if (type === "institutional_memory_record" && t === "Retire") {
     return (
       <p className="text-sm text-kosha-navy">
-        Approving retires this Institutional Memory Record. Its Curated rationale is preserved
-        unchanged — DM-0008 §4.4 forbids rewriting history — the record simply stops appearing
-        in active retrieval.
+        Approving takes this note out of active views. The original text is preserved exactly as it was
+        written — history is never rewritten — it simply stops showing up in day-to-day results.
       </p>
     );
   }
   if (type === "preparedness_record" && t === "Retire") {
     return (
       <p className="text-sm text-kosha-navy">
-        Approving retires this Preparedness Category. The recognition remains in the audit trail;
-        the category is no longer maintained as an active provision to confirm.
+        Approving marks this "what if…" plan as no longer maintained. It stays on file for the record,
+        but the family stops treating it as an active plan to keep current.
       </p>
     );
   }
   if (type === "dedication" && t === "Conclude") {
     return (
       <p className="text-sm text-kosha-navy">
-        Approving records the Dedication's Conclusion. The Philanthropic Purpose is fixed and
-        remains on file — Conclusion recognises that the vehicle itself is being wound up
-        (DM-0006 §5.4).
+        Approving records that this charitable vehicle is being wound up. Its stated purpose is fixed
+        and remains on file — winding up is about the vehicle, never the purpose.
       </p>
     );
   }
   return (
     <p className="text-sm text-kosha-navy">
-      Approving records this transition against the subject. Underlying facts and history are preserved.
+      Approving records this change. The underlying history is preserved.
     </p>
   );
 }
@@ -309,8 +311,8 @@ function MineCard({
   const statusCopy = grant.grant_status === "Requested"
     ? "Awaiting review"
     : grant.grant_status === "Granted"
-    ? "Granted"
-    : "Denied";
+    ? "Approved"
+    : "Declined";
   return (
     <article className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
       <div className="flex flex-wrap items-start justify-between gap-md">
@@ -326,9 +328,7 @@ function MineCard({
           )}
         </div>
       </div>
-      <p className="mt-sm text-sm text-slate-grey">
-        Requested transition · <span className="text-kosha-navy">{transitionLabel(grant)}</span>
-      </p>
+      <TransitionLine grant={grant} />
       {checkerName && (
         <p className="mt-xs text-xs text-slate-grey">Decided by · <span className="text-kosha-navy">{checkerName}</span></p>
       )}
@@ -336,5 +336,23 @@ function MineCard({
         <p className="mt-xs text-xs text-slate-grey">Reason · {grant.denial_reason}</p>
       )}
     </article>
+  );
+}
+
+function TransitionLine({ grant }: { grant: AccessGrant }) {
+  const plain = plainTransition(grant.requested_transition, grant.subject_entity_type);
+  const { formal, hint } = formalHintFor(grant.requested_transition, grant.subject_entity_type);
+  const outcome = grant.requested_outcome ? ` — ${grant.requested_outcome}` : "";
+  return (
+    <p className="mt-sm text-sm text-slate-grey">
+      What will change ·{" "}
+      <span
+        title={hint ? `${formal} — ${hint}` : formal}
+        className="text-kosha-navy underline decoration-dotted decoration-slate-grey/60 underline-offset-4 cursor-help"
+      >
+        {plain}
+      </span>
+      {outcome && <span className="text-kosha-navy">{outcome}</span>}
+    </p>
   );
 }
