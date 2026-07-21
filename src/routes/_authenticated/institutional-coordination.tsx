@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { humanizeState, stateTitle } from "@/lib/state-labels";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
@@ -84,6 +86,7 @@ function InstitutionalCoordinationPage() {
 
   return (
     <section className="max-w-[72rem]">
+      <WorkspaceIntro slug="coordination" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab participantId={participant.id} subjects={owned} onNavigate={setTab} />}
@@ -206,6 +209,7 @@ function OverviewTab({ participantId, subjects, onNavigate }: {
         </p>
         <div className="mt-md flex flex-wrap items-center gap-md">
           <span
+            title={stateTitle(state.label)}
             className={
               "inline-flex items-center rounded-md px-md py-1 text-xs uppercase tracking-widest " +
               (state.tone === "navy"
@@ -213,7 +217,7 @@ function OverviewTab({ participantId, subjects, onNavigate }: {
                 : "bg-vault-ivory text-slate-grey ring-1 ring-[color:var(--color-border-default)]")
             }
           >
-            {state.label}
+            {humanizeState(state.label).label}
           </span>
           <span className="text-xs text-slate-grey">
             {lastReview

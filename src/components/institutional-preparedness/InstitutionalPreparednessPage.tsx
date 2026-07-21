@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { LinkParticipant } from "@/components/access/LinkParticipant";
 import { requestPreparednessRetirement, useHasPendingRequest } from "@/lib/access-grants";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { humanizeState, stateTitle } from "@/lib/state-labels";
 
 /* =============== Types =============== */
 
@@ -269,6 +271,7 @@ export function InstitutionalPreparednessPage() {
 
   return (
     <section className="max-w-[72rem] space-y-xl">
+      <WorkspaceIntro slug="preparedness" />
       <StewardsSection
         participantId={participant.id}
         items={stewards.items}
@@ -366,11 +369,13 @@ function RecordPicker({
               <span className="font-semibold">{r.category_name}</span>
               <span className="flex items-center gap-xs">
                 <Badge>{r.affected_domain}</Badge>
-                <Badge>
-                  {!r.contingency_reference_note || !r.confidence_classification
-                    ? "Emerging Preparedness"
-                    : "Recorded"}
-                </Badge>
+                <span title={stateTitle(!r.contingency_reference_note || !r.confidence_classification ? "Emerging Preparedness" : "Recorded")}>
+                  <Badge>
+                    {!r.contingency_reference_note || !r.confidence_classification
+                      ? humanizeState("Emerging Preparedness").label
+                      : "Recorded"}
+                  </Badge>
+                </span>
               </span>
             </button>
           </li>
@@ -586,7 +591,9 @@ function OverviewTab({ record, onRefresh }: { record: PreparednessRecord; onRefr
         )}
         <div className="mt-sm flex flex-wrap items-center gap-xs">
           <Badge>{record.affected_domain}</Badge>
-          <Badge>{state}</Badge>
+          <span title={stateTitle(state)}>
+            <Badge>{humanizeState(state).label}</Badge>
+          </span>
         </div>
         {record.category_description && (
           <p className="mt-sm max-w-[52rem] whitespace-pre-wrap text-sm text-slate-grey">{record.category_description}</p>

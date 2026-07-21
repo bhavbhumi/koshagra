@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import {
   GOVERNANCE_BODIES,
   GOVERNANCE_DOCUMENT_TYPES,
@@ -70,12 +71,13 @@ function FamilyGovernancePage() {
       <section className="max-w-[42rem]">
         <div className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white p-lg">
           <h2 className="font-display text-[20px] leading-[28px] text-kosha-navy">
-            No Family yet
+            No family recorded yet
           </h2>
           <p className="mt-xs text-sm text-slate-grey">
-            Family Governance helps a Family govern belonging, relationships, and
-            collective decisions. Begin by creating your Family as a Continuity
-            Subject in Institution Registry.
+            This is where a family writes down how it makes decisions together —
+            members, the rulebook you follow, and who sits on which council. Start
+            by adding your family in the Registry; you can add members and rules
+            after that.
           </p>
           <Link
             to="/institution-registry"
@@ -122,6 +124,7 @@ function FamilyGovernancePage() {
 
   return (
     <section className="max-w-[72rem]">
+      <WorkspaceIntro slug="family" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} onNavigate={setTab} />}
