@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import {
   ASSET_TYPES,
   LIFECYCLE_STAGES,
@@ -80,6 +81,7 @@ function EstatePlanningPage() {
 
   return (
     <section className="max-w-[72rem]">
+      <WorkspaceIntro slug="estate" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab estate={estate} onNavigate={setTab} />}
