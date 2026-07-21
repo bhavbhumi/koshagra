@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { formatINR } from "@/lib/estate";
+import { formatDate } from "@/lib/format";
 import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import {
   BENEFICIARY_TYPES,
@@ -241,12 +242,10 @@ function OverviewTab({ trust, onRefreshTrust }: { trust: Trust; onRefreshTrust: 
     return new Date(Math.max(...times)).toISOString();
   }, [trust, settlors, trustees, protectors, beneficiaries, property, instruments]);
 
-  const lastUpdatedLabel = lastUpdatedIso
-    ? new Date(lastUpdatedIso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit" })
-    : null;
+  const lastUpdatedLabel = lastUpdatedIso ? formatDate(lastUpdatedIso) : null;
 
   const instrumentIndicator = latestInstrument
-    ? `Recorded${latestInstrument.executed_date ? ` · executed ${new Date(latestInstrument.executed_date).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit" })}` : ""}`
+    ? `Recorded${latestInstrument.executed_date ? ` · executed ${formatDate(latestInstrument.executed_date)}` : ""}`
     : "Not yet recorded";
 
   return (
@@ -973,7 +972,7 @@ function InstrumentCard({ instrument, onChanged }: { instrument: TrustInstrument
   }
 
   const executedLabel = instrument.executed_date
-    ? new Date(instrument.executed_date).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit" })
+    ? formatDate(instrument.executed_date)
     : "Execution date not recorded";
 
   return (

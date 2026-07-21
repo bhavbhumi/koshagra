@@ -31,12 +31,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "timeline", label: "Timeline" },
 ];
 
-function formatEnInDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-IN", {
-    year: "numeric", month: "short", day: "2-digit",
-  });
-}
+import { formatEnInDate } from "@/lib/format";
 
 function FamilyGovernancePage() {
   const { participant } = useParticipant();

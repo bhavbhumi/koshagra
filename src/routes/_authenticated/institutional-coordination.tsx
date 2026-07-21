@@ -30,10 +30,7 @@ type Advisor = {
   specialty: string | null; contact_note: string | null; notes: string | null;
 };
 
-function formatEnInDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit" });
-}
+import { formatEnInDate } from "@/lib/format";
 
 const DOMAIN_PATH: Record<SubjectType, string | null> = {
   Estate: "/estate-planning",

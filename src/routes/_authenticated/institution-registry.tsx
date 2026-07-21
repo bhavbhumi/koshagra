@@ -8,6 +8,7 @@ import {
   type SubjectType,
 } from "@/lib/continuity-subjects";
 import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/institution-registry")({
   component: InstitutionRegistryPage,
@@ -172,9 +173,7 @@ function InstitutionRegistryPage() {
                     <TypeBadge type={s.subject_type} />
                   </td>
                   <td className="px-md py-3 font-numeral text-slate-grey">
-                    {new Date(s.created_at).toLocaleDateString("en-IN", {
-                      year: "numeric", month: "short", day: "2-digit",
-                    })}
+                    {formatDate(s.created_at)}
                   </td>
                 </tr>
               ))}

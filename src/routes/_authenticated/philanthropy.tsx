@@ -61,10 +61,7 @@ const secondaryBtn =
 const cardCls =
   "rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]";
 
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit" });
-}
+import { formatDate } from "@/lib/format";
 
 /* ================= Hooks ================= */
 
