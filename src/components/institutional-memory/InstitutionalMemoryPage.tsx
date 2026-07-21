@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { LinkParticipant } from "@/components/access/LinkParticipant";
 import { requestMemoryRetirement, useHasPendingRequest } from "@/lib/access-grants";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { humanizeState, stateTitle } from "@/lib/state-labels";
 
 /* =============== Types =============== */
 
@@ -239,6 +241,7 @@ export function InstitutionalMemoryPage() {
 
   return (
     <section className="max-w-[72rem] space-y-xl">
+      <WorkspaceIntro slug="memory" />
       <StewardsSection
         participantId={participant.id}
         items={stewards.items}
@@ -297,7 +300,11 @@ export function InstitutionalMemoryPage() {
                     <span className="font-semibold">{r.title}</span>
                     <span className="flex items-center gap-xs">
                       <Badge>{r.originating_domain}</Badge>
-                      <Badge>{isCurated(r) ? "Curated Memory" : "Emerging Memory"}</Badge>
+                      <span title={stateTitle(isCurated(r) ? "Curated Memory" : "Emerging Memory")}>
+                        <Badge>
+                          {humanizeState(isCurated(r) ? "Curated Memory" : "Emerging Memory").label}
+                        </Badge>
+                      </span>
                     </span>
                   </button>
                 </li>
@@ -552,7 +559,9 @@ function OverviewTab({ record, onRefresh }: { record: MemoryRecord; onRefresh: (
         )}
         <div className="mt-sm flex flex-wrap items-center gap-xs">
           <Badge>{record.originating_domain}</Badge>
-          <Badge>{curated ? "Curated Memory" : "Emerging Memory"}</Badge>
+          <span title={stateTitle(curated ? "Curated Memory" : "Emerging Memory")}>
+            <Badge>{humanizeState(curated ? "Curated Memory" : "Emerging Memory").label}</Badge>
+          </span>
         </div>
         {record.originating_steward_note && (
           <p className="mt-sm text-sm text-slate-grey">Originating steward · {record.originating_steward_note}</p>
