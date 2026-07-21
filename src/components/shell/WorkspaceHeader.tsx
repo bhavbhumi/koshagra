@@ -1,7 +1,5 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
 import type { ParticipantSummary } from "@/lib/workspaces";
 import { findWorkspaceByPath, getVisibleWorkspaces } from "@/lib/workspaces";
 import { useContinuitySubjects } from "@/lib/continuity-subjects";
@@ -217,6 +215,3 @@ export function WorkspaceTabs() {
 export function WorkspaceHeader(props: { participant: ParticipantSummary | null }) {
   return <AppHeader participant={props.participant} onOpenMobileNav={() => {}} />;
 }
-
-// Silence unused-import warnings for helpers retained for future sign-out surfaces.
-void supabase; void useNavigate; void useQueryClient;
