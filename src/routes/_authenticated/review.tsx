@@ -14,6 +14,7 @@ import {
   plainTransition,
   formalHintFor,
 } from "@/components/glossary/Glossary";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/review")({ component: ReviewPage });
 
@@ -268,7 +269,7 @@ function MineCard({
           </span>
           {grant.decision_at && (
             <div className="mt-xs font-numeral text-xs text-slate-grey">
-              {new Date(grant.decision_at).toLocaleDateString()}
+              {formatDate(grant.decision_at)}
             </div>
           )}
         </div>
