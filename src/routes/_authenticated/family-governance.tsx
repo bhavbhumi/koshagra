@@ -71,12 +71,13 @@ function FamilyGovernancePage() {
       <section className="max-w-[42rem]">
         <div className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white p-lg">
           <h2 className="font-display text-[20px] leading-[28px] text-kosha-navy">
-            No Family yet
+            No family recorded yet
           </h2>
           <p className="mt-xs text-sm text-slate-grey">
-            Family Governance helps a Family govern belonging, relationships, and
-            collective decisions. Begin by creating your Family as a Continuity
-            Subject in Institution Registry.
+            This is where a family writes down how it makes decisions together —
+            members, the rulebook you follow, and who sits on which council. Start
+            by adding your family in the Registry; you can add members and rules
+            after that.
           </p>
           <Link
             to="/institution-registry"

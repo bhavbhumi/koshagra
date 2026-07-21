@@ -62,11 +62,13 @@ function EstatePlanningPage() {
       <section className="max-w-[42rem]">
         <div className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white p-lg">
           <h2 className="font-display text-[20px] leading-[28px] text-kosha-navy">
-            No Estate yet
+            Nothing to plan yet
           </h2>
           <p className="mt-xs text-sm text-slate-grey">
-            Estate Planning organizes the continuity of intent beyond your lifetime.
-            Begin by creating your Estate as a Continuity Subject in Institution Registry.
+            This is where you'll record what a person owns, what they owe, and who
+            is meant to receive what. Start by adding an estate in the Registry —
+            you can flesh it out one asset at a time. Nothing has to be complete
+            for it to be useful.
           </p>
           <Link
             to="/institution-registry"

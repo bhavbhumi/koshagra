@@ -76,12 +76,13 @@ function TrustAdministrationPage() {
       <section className="max-w-[42rem]">
         <div className={cardCls}>
           <h2 className="font-display text-[20px] leading-[28px] text-kosha-navy">
-            No Trust yet
+            No trust recorded yet
           </h2>
           <p className="mt-xs text-sm text-slate-grey">
-            Trust Administration governs an already-created Trust — its Trustees, Protectors,
-            Beneficiaries, Trust Property, and recorded Trust Instrument. Create your Trust as a
-            Continuity Subject in Institution Registry to begin.
+            This is where a trust's people, property, and beneficiaries live together
+            in one calm record. The deed itself remains the source of authority —
+            this workspace is the family's living index. Add your trust in the
+            Registry to begin.
           </p>
           <Link to="/institution-registry" className={"mt-md inline-flex items-center " + primaryBtn}>
             Open Institution Registry

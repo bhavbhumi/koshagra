@@ -76,11 +76,13 @@ function BusinessSuccessionPage() {
       <section className="max-w-[42rem]">
         <div className={cardCls}>
           <h2 className="font-display text-[20px] leading-[28px] text-kosha-navy">
-            No Enterprise yet
+            No business recorded yet
           </h2>
           <p className="mt-xs text-sm text-slate-grey">
-            Business Succession stewards Leadership and Ownership across generations. Begin
-            by creating your Enterprise as a Continuity Subject in Institution Registry.
+            This is where you record who owns what share of the business, who steps
+            in next, and who serves on the board. Add your business in the Registry
+            to begin — leadership and ownership can be filled in separately as they
+            settle.
           </p>
           <Link to="/institution-registry" className={"mt-md inline-flex items-center " + primaryBtn}>
             Open Institution Registry
