@@ -51,7 +51,7 @@ export function PrimaryNav({
         )}
       </div>
       <nav className="flex-1 overflow-y-auto px-md py-lg" aria-label="Workspaces">
-        {groups.map(([label, items]) => (
+        {groups.filter(([, items]) => items.length > 0).map(([label, items]) => (
           <div key={label} className="mb-lg">
             <p className="px-sm text-xs uppercase tracking-widest text-vault-ivory/40">{label}</p>
             <ul className="mt-sm space-y-1">
