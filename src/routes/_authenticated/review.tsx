@@ -146,45 +146,65 @@ function PendingCard({
   makerName: string;
   onDecided: () => Promise<void> | void;
 }) {
-  const [mode, setMode] = useState<"idle" | "approve" | "deny">("idle");
+  const [declining, setDeclining] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   async function submit(decision: "Granted" | "Denied") {
     setBusy(true); setMessage(null);
-    const { error } = await decideAccessGrant(grant.id, decision, decision === "Denied" ? reason : null);
+    const { error } = await decideAccessGrant(
+      grant.id,
+      decision,
+      decision === "Denied" ? reason : null,
+    );
     setBusy(false);
     if (error) { setMessage(error.message || "Could not record this decision."); return; }
-    setMode("idle"); setReason("");
+    setDeclining(false); setReason("");
     await onDecided();
   }
 
+  const plain = plainTransition(grant.requested_transition, grant.subject_entity_type);
+  const { formal, hint } = formalHintFor(grant.requested_transition, grant.subject_entity_type);
+  const subjectPlain = plainSubjectType(grant.subject_entity_type);
+  const subjectLabel = grant.subject_label ?? "—";
+  const outcome = grant.requested_outcome ? ` — ${grant.requested_outcome}` : "";
+
   return (
     <article className="rounded-md bg-pure-white p-md shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
-      <div className="flex flex-wrap items-start justify-between gap-md">
-        <SubjectLine grant={grant} />
-        <div className="text-right text-xs text-slate-grey">
-          <div>Asked by</div>
-          <div className="mt-xs text-sm text-kosha-navy">{makerName}</div>
-        </div>
-      </div>
-      <TransitionLine grant={grant} />
+      <p className="text-[15px] leading-[24px] text-kosha-navy">
+        <span className="text-kosha-navy">{makerName}</span>
+        {" is asking to "}
+        <span
+          title={hint ? `${formal} — ${hint}` : formal}
+          className="underline decoration-dotted decoration-slate-grey/60 underline-offset-4 cursor-help"
+        >
+          {plain.toLowerCase()}
+        </span>
+        {" on "}
+        <span className="text-kosha-navy">{subjectLabel}</span>
+        {outcome && <span className="text-kosha-navy">{outcome}</span>}
+        {" — a "}
+        <Term termKey={grant.subject_entity_type as never}>{subjectPlain.toLowerCase()}</Term>
+        {". You can approve or decline. Nothing changes until you do."}
+      </p>
 
       {message && <p className="mt-sm text-sm text-slate-grey">{message}</p>}
 
-      {mode === "idle" && (
+      {!declining && (
         <div className="mt-md flex flex-wrap gap-sm">
           <button
             type="button"
-            onClick={() => setMode("approve")}
-            className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90"
+            disabled={busy}
+            onClick={() => submit("Granted")}
+            className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40"
           >
-            Approve
+            {busy ? "Recording…" : "Approve"}
           </button>
           <button
             type="button"
-            onClick={() => setMode("deny")}
+            disabled={busy}
+            onClick={() => setDeclining(true)}
             className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
           >
             Decline
@@ -192,31 +212,7 @@ function PendingCard({
         </div>
       )}
 
-      {mode === "approve" && (
-        <div className="mt-md rounded-md bg-vault-ivory p-md ring-1 ring-[color:var(--color-border-default)]">
-          <ApprovalExplainer grant={grant} />
-          <div className="mt-md flex flex-wrap gap-sm">
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => submit("Granted")}
-              className="rounded-md bg-kosha-navy px-md py-2 text-sm font-semibold text-vault-ivory hover:bg-kosha-navy/90 disabled:opacity-40"
-            >
-              {busy ? "Recording…" : "Confirm approval"}
-            </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => setMode("idle")}
-              className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {mode === "deny" && (
+      {declining && (
         <div className="mt-md rounded-md bg-vault-ivory p-md ring-1 ring-[color:var(--color-border-default)]">
           <label className="block">
             <span className="text-xs uppercase tracking-widest text-slate-grey">Reason (optional)</span>
@@ -240,7 +236,7 @@ function PendingCard({
             <button
               type="button"
               disabled={busy}
-              onClick={() => { setMode("idle"); setReason(""); }}
+              onClick={() => { setDeclining(false); setReason(""); }}
               className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm font-semibold text-kosha-navy hover:bg-vault-ivory"
             >
               Cancel
@@ -249,57 +245,6 @@ function PendingCard({
         </div>
       )}
     </article>
-  );
-}
-
-function ApprovalExplainer({ grant }: { grant: AccessGrant }) {
-  const t = grant.requested_transition;
-  const type = grant.subject_entity_type;
-  if (type === "governance_document" && t === "Activate") {
-    return (
-      <p className="text-sm text-kosha-navy">
-        Approving makes this the document the family follows from now on. If an earlier version is
-        currently in force, it steps aside — its text stays on file exactly as it was.
-      </p>
-    );
-  }
-  if (type === "representation" && t === "Decide Disposition") {
-    return (
-      <p className="text-sm text-kosha-navy">
-        Approving records what should happen to this digital account
-        {grant.requested_outcome ? <> — <span className="text-kosha-navy">{grant.requested_outcome}</span></> : null}.
-        Koshagra doesn't touch the account itself; it records the decision so the right person can act on it.
-      </p>
-    );
-  }
-  if (type === "institutional_memory_record" && t === "Retire") {
-    return (
-      <p className="text-sm text-kosha-navy">
-        Approving takes this note out of active views. The original text is preserved exactly as it was
-        written — history is never rewritten — it simply stops showing up in day-to-day results.
-      </p>
-    );
-  }
-  if (type === "preparedness_record" && t === "Retire") {
-    return (
-      <p className="text-sm text-kosha-navy">
-        Approving marks this "what if…" plan as no longer maintained. It stays on file for the record,
-        but the family stops treating it as an active plan to keep current.
-      </p>
-    );
-  }
-  if (type === "dedication" && t === "Conclude") {
-    return (
-      <p className="text-sm text-kosha-navy">
-        Approving records that this charitable vehicle is being wound up. Its stated purpose is fixed
-        and remains on file — winding up is about the vehicle, never the purpose.
-      </p>
-    );
-  }
-  return (
-    <p className="text-sm text-kosha-navy">
-      Approving records this change. The underlying history is preserved.
-    </p>
   );
 }
 
