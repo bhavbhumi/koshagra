@@ -28,9 +28,11 @@ export function PrimaryNav({
   }, [pathname]);
 
   const groups: Array<[string, Workspace[]]> = [
+    ["Start here", workspaces.filter((w) => w.kind === "start")],
     ["Home", workspaces.filter((w) => w.kind === "dashboard")],
     ["Continuity workspaces", workspaces.filter((w) => w.kind === "domain")],
-    ["Utilities", workspaces.filter((w) => w.kind === "utility")],
+    ["Shared", workspaces.filter((w) => w.kind === "shared")],
+    ["Admin", workspaces.filter((w) => w.kind === "admin")],
   ];
 
   const railInner = (
