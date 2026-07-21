@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import { humanizeState, stateTitle } from "@/lib/state-labels";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -195,7 +194,6 @@ function PhilanthropyPage() {
 
   return (
     <section className="max-w-[72rem] space-y-lg">
-      <WorkspaceIntro slug="philanthropy" />
       <div className="flex flex-wrap items-center justify-between gap-md">
         {dedications.length > 1 && (
           <div className="flex flex-wrap items-center gap-sm">

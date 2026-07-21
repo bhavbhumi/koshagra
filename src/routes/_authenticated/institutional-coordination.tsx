@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import { humanizeState, stateTitle } from "@/lib/state-labels";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -83,7 +82,6 @@ function InstitutionalCoordinationPage() {
 
   return (
     <section className="max-w-[72rem]">
-      <WorkspaceIntro slug="coordination" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab participantId={participant.id} subjects={owned} onNavigate={setTab} />}

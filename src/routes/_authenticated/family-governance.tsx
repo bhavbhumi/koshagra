@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import {
   GOVERNANCE_BODIES,
   GOVERNANCE_DOCUMENT_TYPES,
@@ -119,7 +118,6 @@ function FamilyGovernancePage() {
 
   return (
     <section className="max-w-[72rem]">
-      <WorkspaceIntro slug="family" />
       <TabBar tab={tab} onChange={setTab} />
       <div className="mt-lg">
         {tab === "overview" && <OverviewTab family={family} onRefreshFamily={refresh} onNavigate={setTab} />}

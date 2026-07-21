@@ -7,7 +7,6 @@ import {
   useContinuitySubjects,
   type SubjectType,
 } from "@/lib/continuity-subjects";
-import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/institution-registry")({
@@ -53,7 +52,6 @@ function InstitutionRegistryPage() {
 
   return (
     <section className="max-w-[64rem]">
-      <WorkspaceIntro slug="registry" />
       <div className="flex items-center justify-between gap-md">
         <p className="text-sm text-slate-grey">
           {subjects && subjects.length > 0
