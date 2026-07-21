@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { humanizeState, stateTitle } from "@/lib/state-labels";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
@@ -196,6 +198,7 @@ function PhilanthropyPage() {
 
   return (
     <section className="max-w-[72rem] space-y-lg">
+      <WorkspaceIntro slug="philanthropy" />
       <div className="flex flex-wrap items-center justify-between gap-md">
         {dedications.length > 1 && (
           <div className="flex flex-wrap items-center gap-sm">
@@ -452,6 +455,7 @@ function OverviewTab({ dedication, onRefresh }: { dedication: Dedication; onRefr
 
         <div className="mt-md flex flex-wrap items-center gap-md">
           <span
+            title={stateTitle(state.label)}
             className={
               "inline-flex items-center rounded-md px-md py-1 text-xs uppercase tracking-widest " +
               (state.tone === "navy"
@@ -459,7 +463,7 @@ function OverviewTab({ dedication, onRefresh }: { dedication: Dedication; onRefr
                 : "bg-vault-ivory text-slate-grey ring-1 ring-[color:var(--color-border-default)]")
             }
           >
-            {state.label}
+            {humanizeState(state.label).label}
           </span>
           <span className="text-xs text-slate-grey">
             {reviews.length > 0
