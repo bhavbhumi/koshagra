@@ -16,11 +16,38 @@ function InstitutionRegistryPage() {
   const { participant } = useParticipant();
   const { subjects, loading, refresh } = useContinuitySubjects();
   const [creating, setCreating] = useState(false);
+  const [query, setQuery] = useState("");
+  const [selectedTypes, setSelectedTypes] = useState<Set<SubjectType>>(new Set());
 
   const hasEstate = useMemo(
     () => (subjects ?? []).some((s) => s.subject_type === "Estate"),
     [subjects],
   );
+
+  const filtered = useMemo(() => {
+    const list = subjects ?? [];
+    const q = query.trim().toLowerCase();
+    return list.filter((s) => {
+      if (selectedTypes.size > 0 && !selectedTypes.has(s.subject_type)) return false;
+      if (q) {
+        const hay = `${s.name} ${s.purpose_description ?? ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [subjects, query, selectedTypes]);
+
+  function toggleType(t: SubjectType) {
+    setSelectedTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t);
+      else next.add(t);
+      return next;
+    });
+  }
+
+  const hasAny = (subjects ?? []).length > 0;
+  const isFiltering = query.trim().length > 0 || selectedTypes.size > 0;
 
   return (
     <section className="max-w-[64rem]">
@@ -53,6 +80,54 @@ function InstitutionRegistryPage() {
         />
       )}
 
+      {hasAny && (
+        <div className="mt-lg flex flex-col gap-sm sm:flex-row sm:items-center sm:justify-between">
+          <label className="flex flex-1 flex-col gap-xs sm:max-w-[24rem]">
+            <span className="sr-only">Search Continuity Subjects</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name or purpose"
+              className="rounded-md border border-[color:var(--color-border-default)] bg-pure-white px-md py-2 text-sm text-kosha-navy"
+            />
+          </label>
+          <div className="flex flex-wrap items-center gap-xs">
+            {SUBJECT_TYPES.map((t) => {
+              const active = selectedTypes.has(t);
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => toggleType(t)}
+                  aria-pressed={active}
+                  className={
+                    "rounded-full border px-sm py-1 text-xs transition-colors " +
+                    (active
+                      ? "border-kosha-navy bg-kosha-navy text-vault-ivory"
+                      : "border-[color:var(--color-border-default)] bg-pure-white text-kosha-navy hover:bg-vault-ivory")
+                  }
+                >
+                  {t}
+                </button>
+              );
+            })}
+            {isFiltering && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setSelectedTypes(new Set());
+                }}
+                className="ml-xs text-xs text-slate-grey underline hover:text-kosha-navy"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="mt-lg overflow-hidden rounded-md bg-pure-white shadow-[var(--shadow-1)] ring-1 ring-[color:var(--color-border-default)]">
         {loading ? (
           <div className="p-lg text-sm text-slate-grey" aria-busy="true">
@@ -69,6 +144,10 @@ function InstitutionRegistryPage() {
               your continuity work is organized around. Create your first one to begin.
             </p>
           </div>
+        ) : filtered.length === 0 ? (
+          <div className="p-lg text-sm text-slate-grey">
+            No Continuity Subjects match this search.
+          </div>
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="bg-vault-ivory text-xs uppercase tracking-widest text-slate-grey">
@@ -79,9 +158,14 @@ function InstitutionRegistryPage() {
               </tr>
             </thead>
             <tbody>
-              {(subjects ?? []).map((s) => (
+              {filtered.map((s) => (
                 <tr key={s.id} className="border-t border-[color:var(--color-border-default)]">
-                  <td className="px-md py-3 text-kosha-navy">{s.name}</td>
+                  <td className="px-md py-3 text-kosha-navy">
+                    <div>{s.name}</div>
+                    {s.purpose_description && (
+                      <div className="mt-1 truncate text-xs text-slate-grey">{s.purpose_description}</div>
+                    )}
+                  </td>
                   <td className="px-md py-3">
                     <TypeBadge type={s.subject_type} />
                   </td>

@@ -28,9 +28,11 @@ export function PrimaryNav({
   }, [pathname]);
 
   const groups: Array<[string, Workspace[]]> = [
+    ["Start here", workspaces.filter((w) => w.kind === "start")],
     ["Home", workspaces.filter((w) => w.kind === "dashboard")],
     ["Continuity workspaces", workspaces.filter((w) => w.kind === "domain")],
-    ["Utilities", workspaces.filter((w) => w.kind === "utility")],
+    ["Shared", workspaces.filter((w) => w.kind === "shared")],
+    ["Admin", workspaces.filter((w) => w.kind === "admin")],
   ];
 
   const railInner = (
@@ -49,7 +51,7 @@ export function PrimaryNav({
         )}
       </div>
       <nav className="flex-1 overflow-y-auto px-md py-lg" aria-label="Workspaces">
-        {groups.map(([label, items]) => (
+        {groups.filter(([, items]) => items.length > 0).map(([label, items]) => (
           <div key={label} className="mb-lg">
             <p className="px-sm text-xs uppercase tracking-widest text-vault-ivory/40">{label}</p>
             <ul className="mt-sm space-y-1">

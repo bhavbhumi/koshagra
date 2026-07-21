@@ -16,7 +16,7 @@ export type ParticipantSummary = {
   capacity_name: string;
 };
 
-export type WorkspaceKind = "dashboard" | "domain" | "utility";
+export type WorkspaceKind = "start" | "dashboard" | "domain" | "shared" | "admin";
 
 export type Workspace = {
   slug: string;
@@ -27,6 +27,14 @@ export type Workspace = {
 };
 
 export const WORKSPACES: Workspace[] = [
+  {
+    slug: "institution-registry",
+    path: "/institution-registry",
+    name: "Institution Registry",
+    purpose:
+      "Every Continuity Subject you steward — Estate, Family, Enterprise, Trust, or Digital Legacy — in one place. Start here.",
+    kind: "start",
+  },
   {
     slug: "dashboard",
     path: "/dashboard",
@@ -106,41 +114,26 @@ export const WORKSPACES: Workspace[] = [
     kind: "domain",
   },
   {
-    slug: "search",
-    path: "/search",
-    name: "Search",
-    purpose: "Global search across every workspace.",
-    kind: "utility",
-  },
-  {
-    slug: "institution-registry",
-    path: "/institution-registry",
-    name: "Institution Registry",
-    purpose:
-      "Every Continuity Subject you steward — Estate, Family, Enterprise, Trust, or Digital Legacy — in one place.",
-    kind: "utility",
-  },
-  {
     slug: "review",
     path: "/review",
     name: "Review",
     purpose:
       "Every Access Grant awaiting your decision, and the status of what you've requested.",
-    kind: "utility",
+    kind: "shared",
   },
   {
     slug: "notifications",
     path: "/notifications",
     name: "Notification Center",
     purpose: "One consolidated inbox for every actionable signal.",
-    kind: "utility",
+    kind: "shared",
   },
   {
     slug: "admin",
     path: "/admin",
     name: "Admin",
     purpose: "Administrative controls (visibility arrives with real Access Grants).",
-    kind: "utility",
+    kind: "admin",
   },
 ];
 
