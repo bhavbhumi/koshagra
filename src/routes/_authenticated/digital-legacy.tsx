@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { LinkParticipant } from "@/components/access/LinkParticipant";
 import { requestDisposition, useHasPendingRequest } from "@/lib/access-grants";
+import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { humanizeState, stateTitle } from "@/lib/state-labels";
 
 export const Route = createFileRoute("/_authenticated/digital-legacy")({
   component: DigitalLegacyPage,
@@ -194,6 +196,7 @@ function DigitalLegacyPage() {
 
   return (
     <section className="max-w-[72rem] space-y-xl">
+      <WorkspaceIntro slug="digital" />
       <DigitalExecutorsSection
         participantId={participant.id}
         items={executors.items}
@@ -527,6 +530,7 @@ function OverviewTab({ rep, onRefresh }: { rep: Representation; onRefresh: () =>
 
         <div className="mt-md flex flex-wrap items-center gap-md">
           <span
+            title={stateTitle(state.label)}
             className={
               "inline-flex items-center rounded-md px-md py-1 text-xs uppercase tracking-widest " +
               (state.tone === "navy"
@@ -534,7 +538,7 @@ function OverviewTab({ rep, onRefresh }: { rep: Representation; onRefresh: () =>
                 : "bg-vault-ivory text-slate-grey ring-1 ring-[color:var(--color-border-default)]")
             }
           >
-            {state.label}
+            {humanizeState(state.label).label}
           </span>
           <span className="text-xs text-slate-grey">
             {checks.length > 0
