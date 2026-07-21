@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PrimaryNav } from "@/components/shell/PrimaryNav";
-import { AppHeader, WorkspaceTabs } from "@/components/shell/WorkspaceHeader";
+import { AppHeader } from "@/components/shell/WorkspaceHeader";
 import { useParticipant } from "@/lib/participant";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -33,7 +33,6 @@ function AuthenticatedLayout() {
       />
       {/* Main content: offset for fixed header (h-14) and desktop sidebar (w-64) */}
       <div className="flex min-w-0 flex-col pt-14 md:pl-64">
-        <WorkspaceTabs />
         <main className="flex-1 px-md py-lg sm:px-xl sm:py-xl md:px-3xl md:py-3xl">
           <Outlet />
         </main>
