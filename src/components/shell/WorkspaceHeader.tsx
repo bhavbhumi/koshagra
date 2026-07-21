@@ -63,11 +63,12 @@ export function AppHeader({
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between gap-md border-b border-[color:var(--color-border-default)] bg-pure-white px-md sm:px-xl"
+      className="fixed inset-x-0 top-0 z-40 flex h-14 items-stretch border-b border-[color:var(--color-border-default)] bg-pure-white"
       aria-label="Application header"
     >
-      {/* Left: hamburger (mobile) + brand + breadcrumb */}
-      <div className="flex min-w-0 items-center gap-md">
+      {/* Left segment — aligned to the sidebar rail (w-64 on desktop).
+          Contains only the App Logo + Name. */}
+      <div className="flex items-center gap-md px-md sm:px-xl md:w-64 md:shrink-0 md:border-r md:border-[color:var(--color-border-default)]">
         <button
           type="button"
           aria-label="Open navigation"
@@ -79,6 +80,11 @@ export function AppHeader({
         <Link to="/dashboard" className="shrink-0" aria-label="Koshagra home">
           <img src="/brand/lockup-horizontal-primary.svg" alt="Koshagra" className="h-6 w-auto" />
         </Link>
+      </div>
+
+      {/* Right segment — spans the main content column. Breadcrumb + (i) tooltip
+          on the left, workspace switcher on the right. */}
+      <div className="flex flex-1 min-w-0 items-center justify-between gap-md px-md sm:px-xl">
         <nav aria-label="Breadcrumb" className="hidden sm:block min-w-0 text-xs text-slate-grey">
           <ol className="flex items-center gap-2">
             <li className="shrink-0"><Link to="/dashboard" className="hover:text-kosha-navy">Home</Link></li>
@@ -112,10 +118,8 @@ export function AppHeader({
             )}
           </ol>
         </nav>
-      </div>
-
-      {/* Right: workspace switcher */}
-      <div className="relative" ref={menuRef}>
+        {/* Workspace switcher, anchored to the right edge of the right segment */}
+        <div className="relative ml-auto" ref={menuRef}>
         <button
           type="button"
           onClick={() => setSwitcherOpen((v) => !v)}
@@ -179,6 +183,7 @@ export function AppHeader({
             )}
           </div>
         )}
+        </div>
       </div>
 
       <span className="sr-only" data-visible-workspaces={visible.map((w) => w.slug).join(",")} />
