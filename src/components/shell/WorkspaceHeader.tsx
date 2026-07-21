@@ -107,8 +107,7 @@ export function AppHeader({
                     {purposeOpen && (
                       <span
                         role="tooltip"
-                        className="fixed z-[100] mt-2 w-64 -translate-x-1/2 rounded-md bg-kosha-navy px-md py-sm text-xs font-normal normal-case tracking-normal text-vault-ivory shadow-[var(--shadow-2)]"
-                        style={{ top: "3.25rem" }}
+                        className="absolute left-1/2 top-full z-[100] mt-2 w-64 -translate-x-1/2 rounded-md bg-kosha-navy px-md py-sm text-xs font-normal normal-case tracking-normal text-vault-ivory shadow-[var(--shadow-2)]"
                       >
                         {current.purpose}
                       </span>
