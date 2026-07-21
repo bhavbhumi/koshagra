@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useParticipant } from "@/lib/participant";
 import { WorkspaceIntro } from "@/components/shell/WorkspaceIntro";
+import { formatDate } from "@/lib/format";
 import {
   ENTERPRISE_DOCUMENT_TYPES,
   PRINCIPAL_ROLES,
@@ -216,9 +217,7 @@ function OverviewTab({ enterprise, onRefreshEnterprise }: { enterprise: Enterpri
     return new Date(Math.max(...times)).toISOString();
   }, [enterprise, principals, interests, successors, keyPersons, docs, board]);
 
-  const lastUpdatedLabel = lastUpdatedIso
-    ? new Date(lastUpdatedIso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit" })
-    : null;
+  const lastUpdatedLabel = lastUpdatedIso ? formatDate(lastUpdatedIso) : null;
 
   return (
     <div className="space-y-xl">
