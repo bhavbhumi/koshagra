@@ -68,7 +68,7 @@ export function AppHeader({
     >
       {/* Left segment — aligned to the sidebar rail (w-64 on desktop).
           Contains only the App Logo + Name. */}
-      <div className="flex items-center gap-md px-md sm:px-xl md:w-64 md:shrink-0 md:border-r md:border-[color:var(--color-border-default)]">
+      <div className="flex items-center gap-md px-md md:pl-md md:pr-md md:w-64 md:shrink-0 md:border-r md:border-[color:var(--color-border-default)]">
         <button
           type="button"
           aria-label="Open navigation"
@@ -78,7 +78,7 @@ export function AppHeader({
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <Link to="/dashboard" className="shrink-0" aria-label="Koshagra home">
-          <img src="/brand/lockup-horizontal-primary.svg" alt="Koshagra" className="h-9 w-auto max-w-[200px]" />
+          <img src="/brand/lockup-horizontal-primary.svg" alt="Koshagra" className="h-11 w-auto max-w-[220px]" />
         </Link>
       </div>
 
