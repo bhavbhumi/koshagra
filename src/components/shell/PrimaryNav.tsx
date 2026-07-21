@@ -153,6 +153,7 @@ function UserFooter({ participant }: { participant: ParticipantSummary | null })
   const name = participant?.display_name ?? "Participant";
   const email = participant?.email ?? "";
   const capacity = participant?.capacity_name ?? "Principal";
+  const accountType = participant?.participant_type ?? "Individual";
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
@@ -176,7 +177,9 @@ function UserFooter({ participant }: { participant: ParticipantSummary | null })
           {initials}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm text-vault-ivory">{name}</span>
+          <span className="block truncate text-sm text-vault-ivory">
+            {name} <span className="text-vault-ivory/50">· {accountType}</span>
+          </span>
           <span className="block truncate text-xs text-vault-ivory/50">
             Capacity · {capacity}
           </span>
