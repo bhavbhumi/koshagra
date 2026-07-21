@@ -78,7 +78,7 @@ export function AppHeader({
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <Link to="/dashboard" className="shrink-0" aria-label="Koshagra home">
-          <img src="/brand/lockup-horizontal-primary.svg" alt="Koshagra" className="h-6 w-auto" />
+          <img src="/brand/lockup-horizontal-primary.svg" alt="Koshagra" className="h-9 w-auto max-w-[200px]" />
         </Link>
       </div>
 
@@ -91,7 +91,7 @@ export function AppHeader({
             {current && current.slug !== "dashboard" && (
               <>
                 <li aria-hidden className="shrink-0">·</li>
-                <li className="min-w-0 truncate text-kosha-navy inline-flex items-center gap-1">
+                <li className="min-w-0 text-kosha-navy inline-flex items-center gap-1">
                   <span className="truncate">{current.name}</span>
                   <button
                     type="button"
@@ -107,7 +107,7 @@ export function AppHeader({
                     {purposeOpen && (
                       <span
                         role="tooltip"
-                        className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-md bg-kosha-navy px-md py-sm text-xs font-normal normal-case tracking-normal text-vault-ivory shadow-[var(--shadow-2)]"
+                        className="absolute left-1/2 top-full z-[100] mt-2 w-64 -translate-x-1/2 rounded-md bg-kosha-navy px-md py-sm text-xs font-normal normal-case tracking-normal text-vault-ivory shadow-[var(--shadow-2)]"
                       >
                         {current.purpose}
                       </span>
